@@ -11,7 +11,7 @@
 | **Tên dự án** | Spa Management System |
 | **Loại** | Web Application — Monolith |
 | **Môn học** | Lập trình Web (Cuối kỳ) |
-| **Stack** | NestJS · React · MongoDB · TypeScript |
+| **Stack** | NestJS · React (base-web-umi) · MongoDB · TypeScript |
  
 ### Mục tiêu hệ thống
  
@@ -23,18 +23,41 @@ Quản lý toàn bộ hoạt động của Spa, tập trung vào 4 mảng chính
 - **Báo cáo & Nhân sự** — Thống kê doanh thu, lương nhân viên
  
 ---
+### Môi trường runtime
+
+| Thành phần  | Node.js     | TypeScript | Framework            |
+| ----------- | ----------- | ---------- | -------------------- |
+| **Backend** | 24 LTS      | 5.x        | NestJS               |
+| **Frontend**| 16 LTS      | 4.x        | Umi |
  
 ##  Kiến trúc Repo
  
-Repo này là **repo cha** sử dụng **Git Submodules**. Mỗi thành phần là một repo độc lập.
- 
+Repo này là **repo cha** sử dụng **Git Subtree**.  
+Code của từng thành phần được nhúng trực tiếp vào repo cha (không phải pointer như Submodule).
 ```
-spa-management/                  ← Repo cha (repo này)
-├── backend/                     ← Submodule: spa-management-backend
-├── frontend/                    ← Submodule: spa-management-frontend
-└── documents/                   ← Submodule: spa-management-docs 
+spa-management/              ← Repo cha (repo này)
+├── backend/                 ← NestJS 
+├── frontend/                ← Subtree (Repo Child riêng duy nhất) (base-Umi)
+└── documents/               ← Tài liệu 
 ```
- 
+
+### Tại sao frontend tách thành Git Subtree riêng?
+
+Frontend sử dụng **base-web-umi** — một template legacy với môi trường:
+- Node.js 16
+- TypeScript 4.x
+- Umi  + Ant Design Pro
+
+Backend sử dụng môi trường hiện đại hơn:
+- Node.js >= 24
+- TypeScript 5.x
+- NestJS
+
+Hai môi trường **không tương thích để chạy chung**, nên frontend được
+tách thành repo riêng và nhúng vào repo cha qua Git Subtree.  
+Backend và Documents nằm trực tiếp trong repo cha, commit/push bình thường.
+
+---
 
  
 ## Modules hệ thống
@@ -52,44 +75,28 @@ spa-management/                  ← Repo cha (repo này)
  
 ##  Bắt đầu nhanh
  
-### Yêu cầu hệ thống
- 
-- Node.js 
-- Docker & Docker Compose
-- Git (hỗ trợ submodules)
- 
-### Clone repo đầy đủ (bao gồm submodules)
- 
-```bash
-# Clone repo cha + tất cả submodules cùng lúc
-git clone --recurse-submodules <url>
- 
-# Hoặc nếu đã clone rồi mà chưa có submodules
-git submodule update --init --recursive
-```
- 
-### Cập nhật submodule lên commit mới nhất
- 
-```bash
-# Cập nhật tất cả submodules
-git submodule update --remote --merge
- 
-# Cập nhật 1 submodule cụ thể
-git submodule update --remote <backend>
-```
- 
-### Chạy toàn bộ hệ thống (Docker)
- 
-```bash
 
+### Chạy bằng Docker (khuyến nghị)
+```bash
+git clone  spa-management
+cd spa-management
+
+cp .env.example .env
+docker compose up -d
 ```
- 
 | Service | URL |
 |---|---|
 | Frontend | http://localhost: |
 | Backend API | http://localhost: |
+| Swagger UI | http://localhost:.../api
 | MongoDB | mongodb://localhost: |
  
 ---
- 
+ ## Tài liệu
+
+
+| Tài liệu                          | Đường dẫn                             |
+| --------------------------------- | ------------------------------------- |
+| Hướng dẫn setup & Git workflow    | [`CONTRIBUTING.md`](./CONTRIBUTING.md)|
+| Coding convention                 | [`CODING_CONVENTION.md`](./CODING_CONVENTION.md) |
 
