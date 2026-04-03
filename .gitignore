@@ -1,0 +1,64 @@
+# =============================
+# Quy tắc ignore ở thư mục gốc (repo cha)
+# Áp dụng cho backend và các thư mục dùng chung
+# Frontend có thể giữ .gitignore riêng trong frontend/
+# =============================
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Log
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# File môi trường (chỉ giữ file mẫu)
+.env
+.env.*
+!.env.example
+
+# Thư viện phụ thuộc Node
+node_modules/
+
+# Kết quả build
+build/
+dist/
+coverage/
+.nyc_output/
+.tmp/
+tmp/
+
+# Bộ nhớ đệm
+.cache/
+.eslintcache
+*.tsbuildinfo
+
+# Runtime / tiến trình
+*.pid
+*.pid.lock
+
+# File nén
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# Tệp sinh ra khi test
+junit.xml
+playwright-report/
+
+# Upload / file phát sinh ở repo cha
+uploads/
+storage/
+public/uploads/
+
+# Vẫn theo dõi thư mục docs; chỉ ignore file cache phát sinh nếu có
+docs/.cache/
+
+# Ẩn instruction nội bộ cho AI 
+.github/instructions.md
