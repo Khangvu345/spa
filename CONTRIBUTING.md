@@ -15,12 +15,6 @@ cd spa-management
 
 Backend và Documents, cũng như folder khác đã có sẵn trong repo — không cần thêm bước nào.
 
-### 2. Pull frontend subtree về (nếu thư mục `frontend/` còn trống)
-```bash
-git subtree pull --prefix=frontend  main --squash
-```
-
----
 
 ## Chạy local (không Docker)
 
