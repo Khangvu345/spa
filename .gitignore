@@ -61,4 +61,4 @@ public/uploads/
 docs/.cache/
 
 # Ẩn instruction nội bộ cho AI 
-.github/instructions.md
+.github/*.md
