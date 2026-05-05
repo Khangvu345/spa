@@ -224,26 +224,40 @@ interface Booking extends BaseEntity {
 ```typescript
 // booking.schema.ts (BE)
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Transform } from 'class-transformer';
- 
-@Schema({ timestamps: true, collection: 'bookings' })
+import { HydratedDocument, Schema as MongooseSchema, Types } from 'mongoose';
+import { BookingStatus } from '../constants/booking.constants';
+
+export type BookingDocument = HydratedDocument<Booking>;
+
+@Schema({
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
+  collection: 'bookings'
+})
 export class Booking {
-  // Transform _id (ObjectId) → id (string) trong response
-  @Transform(({ value }) => value.toString())
-  id: string;
- 
-  @Prop({ required: true, unique: true })
-  booking_code: string;   // MongoDB: snake_case
- 
+  // TS field name = camelCase (theo mục 3.1)
+  // MongoDB lưu snake_case qua @Prop({ name: '...' })
+
+  @Prop({ required: true, unique: true, name: 'booking_code' })
+  bookingCode: string;
+
   @Prop({ required: true, enum: BookingStatus, default: BookingStatus.PENDING })
   status: BookingStatus;
- 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Customer', required: true })
-  customer_id: Types.ObjectId;  // MongoDB: snake_case
- 
-  @Prop({ required: true })
-  scheduled_at: Date;   // MongoDB: snake_case
+
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    ref: 'Customer',
+    required: true,
+    name: 'customer_id'
+  })
+  customerId: Types.ObjectId;
+
+  @Prop({ required: true, name: 'scheduled_at' })
+  scheduledAt: Date;
 }
+
+export const BookingSchema = SchemaFactory.createForClass(Booking);
+
+BookingSchema.index({ booking_code: 1 }, { unique: true });
 ```
  
 ```typescript
