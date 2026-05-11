@@ -1,0 +1,30 @@
+# Active Assignments
+
+> Bảng việc-đang-mở của team. **1 row/dev**. AI mở conversation mới đọc đây để biết hiện tại.
+> STATUS.md = hiện tại; TIMELINE.md = lịch sử. Không lẫn vai trò.
+
+---
+
+| Dev | Issue | Module | Active Log | Trạng thái | Bắt đầu |
+|---|---|---|---|---|---|
+| --- | --- | --- | --- | ---| --- |
+| --- | --- | ---| --- | ---| --- |
+
+---
+
+## Trạng thái legend
+
+- 🟡 **đang code** — dev đang làm việc
+- 🔴 **blocked** — kẹt, ghi rõ blocker trong active log
+- ⚪ **chưa nhận việc** — đang rảnh, chờ assign
+
+> Không track "mở PR / chờ review / done" trong STATUS.md — các state đó xảy ra trên GitHub, AI không tự detect được. Khi dev xong task hoặc PR đã merge → clear row.
+
+---
+
+## Quy tắc cập nhật
+
+- **Đầu session** (Workflow A bước 5): set row của dev — Issue link, Module, Active Log link, status 🟡, Bắt đầu = ngày hôm nay
+- **Trong session**: gặp blocker → 🔴 (ghi rõ blocker ở log)
+- **Xong task** (commit xong, mở PR, hoặc merge): dev báo AI "đã xong issue X" **hoặc** dev tự edit STATUS.md — clear row về `—`. Nếu issue đã merge: đổi `issues/<id>.md` status: `done`.
+- KHÔNG xóa row dev (giữ row, chỉ reset values)
