@@ -26,10 +26,15 @@ export const ERROR_CODES = {
   // ──────────────────────────────────────
   // Employee + Auth
   // ──────────────────────────────────────
+  STAFF_NOT_FOUND:          'STAFF_NOT_FOUND',
+  STAFF_EMAIL_EXISTS:       'STAFF_EMAIL_EXISTS',
   EMPLOYEE_NOT_FOUND:       'EMPLOYEE_NOT_FOUND',
   EMAIL_ALREADY_EXISTS:     'EMAIL_ALREADY_EXISTS',
   INVALID_CREDENTIALS:      'INVALID_CREDENTIALS',
   INACTIVE_ACCOUNT:         'INACTIVE_ACCOUNT',
+  INSUFFICIENT_PERMISSIONS: 'INSUFFICIENT_PERMISSIONS',
+  PASSWORD_INCORRECT:       'PASSWORD_INCORRECT',
+  NEW_PASSWORD_SAME_AS_OLD: 'NEW_PASSWORD_SAME_AS_OLD',
 
   // ──────────────────────────────────────
   // Spa Service + BOM + Commission Config
