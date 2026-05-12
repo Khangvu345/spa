@@ -1,0 +1,77 @@
+# Module: auth
+
+> Living state document — cập nhật khi đóng session ⚠️. AI đọc đây thay vì replay logs.
+
+---
+
+## Mô tả
+
+Module Authentication core cho staff: đăng nhập JWT, lấy profile hiện tại, đổi mật khẩu và RBAC guard nền tảng.
+
+---
+
+## Thành viên phụ trách
+
+- **Chính:** Khang
+- **Hỗ trợ:** —
+
+---
+
+## Liên kết
+
+- **Code:** `src/modules/auth`, `src/modules/employee/employee`
+- **API spec:** Swagger `/api-docs`
+- **Related modules:** `employee/employee` chứa Staff schema dùng chung cho Auth + Employee CRUD sau này
+
+---
+
+## Hiện trạng (Current Snapshot)
+
+> Đây là source of truth cho "module hiện trạng". Cập nhật khi đóng session ⚠️.
+
+### Endpoints đã implement
+
+| Method | Path | Mô tả |
+|---|---|---|
+| POST | `/auth/login` | Staff login bằng email/password, public, trả JWT + StaffResponseDto |
+| GET | `/auth/me` | Lấy thông tin staff hiện tại từ JWT |
+| POST | `/auth/change-password` | Staff tự đổi mật khẩu, verify current password, trả 204 |
+
+### Schema fields chính
+
+- `Staff.fullName: string` → Mongo `full_name`
+- `Staff.phone: string` → SĐT VN 10 chữ số theo DTO/issue sau
+- `Staff.email: string` → unique, dùng làm username login
+- `Staff.passwordHash: string` → Mongo `password_hash`, không expose qua response
+- `Staff.role: StaffRole` → `ADMIN | RECEPTIONIST | CASHIER | STAFF`
+- `Staff.baseSalary: number` → Mongo `base_salary`, default 0
+- `Staff.workStatus: WorkStatus` → `ACTIVE | ON_LEAVE | RESIGNED`
+- `Staff.accountStatus: AccountStatus` → `ACTIVE | LOCKED | DELETED`
+- `Staff.startedAt: Date` → Mongo `started_at`
+- `Staff.lockedAt: Date | null` → Mongo `locked_at`, không expose qua StaffResponseDto ở issue #02
+- `Staff.mustChangePassword: boolean` → Mongo `must_change_password`, FE dùng để redirect đổi mật khẩu
+
+### Quyết định kỹ thuật quan trọng
+
+- Global guard bật ở `AppModule`: JWT mặc định bắt buộc cho toàn app, endpoint public phải dùng `@Public()`.
+- Login chỉ check `account_status === ACTIVE`; không check `work_status`, nên staff `ON_LEAVE` vẫn login được.
+- Login chống timing attack bằng dummy bcrypt hash khi email không tồn tại.
+- `StaffResponseDto` là tín hiệu duy nhất cho FE về `mustChangePassword`; không tạo endpoint riêng.
+- Không tạo `POST /auth/logout`; client tự xóa stateless JWT.
+- Health endpoint được đánh dấu `@Public()` để vẫn dùng smoke check khi global guard bật.
+- DNS config cho MongoDB Atlas SRV được tách vào `config/dns.config.ts` để cả app runtime và `seed-admin` cùng dùng.
+
+### Pending
+
+- [x] Postman smoke test đầy đủ các case trong issue #02 với DB dev.
+- [ ] Issue #03 implement Employee CRUD, không sửa Staff schema nền.
+- [ ] Issue #04 implement admin reset password/lock/unlock, không sửa Staff schema nền.
+- [ ] PR riêng update skill thêm section "Action Endpoints Pattern" như issue #02 ghi chú.
+
+---
+
+## Lịch sử log
+
+| File | Ngày | Dev | Tóm tắt |
+|---|---|---|---|
+| [2026-05-12_001_Khang](2026-05-12_001_Khang.md) | 2026-05-12 | Khang | Implement auth core JWT/RBAC + Staff schema |

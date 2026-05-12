@@ -9,6 +9,7 @@
 
 | Ngày | # | Dev | Module | Issue | Tóm tắt | Code? | Link |
 |---|---|---|---|---|---|---|---|
+| 2026-05-12 | 001 | Khang | auth | [#02](issues/02.md) | Implement auth core JWT/RBAC + Staff schema | ⚠️ | [log](modules/auth/2026-05-12_001_Khang.md) |
 |---|---|---|---|---|---|---|---|
 
 ---
@@ -17,12 +18,11 @@
 
 > Cập nhật thủ công hoặc bỏ qua nếu không cần.
 
-- **Tổng logs:** 0
+- **Tổng logs:** 1
 - **Per-dev:**
-  - <!-- dev1: 0 logs -->
-  - <!-- dev2: 0 logs -->
+  - Khang: 1 log
 - **Per-module:**
-  - <!-- module1: 0 logs -->
+  - auth: 1 log
 
 ---
 
