@@ -69,7 +69,7 @@ export class ServiceService {
   ): Promise<{ data: ServiceResponseDto[]; meta: PaginationMeta }> {
     const filter: Record<string, unknown> = {};
 
-    filter.is_active = query.isActive !== undefined ? query.isActive : true;
+    filter.isActive = query.isActive !== undefined ? query.isActive : true;
 
     if (query.category) {
       filter.category = query.category;
@@ -83,7 +83,7 @@ export class ServiceService {
       const priceFilter: Record<string, number> = {};
       if (query.minPrice !== undefined) priceFilter.$gte = query.minPrice;
       if (query.maxPrice !== undefined) priceFilter.$lte = query.maxPrice;
-      filter.unit_price = priceFilter;
+      filter.unitPrice = priceFilter;
     }
 
     const page = query.page ?? DEFAULT_PAGE;
@@ -92,7 +92,7 @@ export class ServiceService {
 
     const sortFieldMap: Record<string, string> = {
       name: 'name',
-      unitPrice: 'unit_price',
+      unitPrice: 'unitPrice',
       createdAt: 'created_at',
     };
     const sortField = sortFieldMap[query.sortBy ?? 'createdAt'];

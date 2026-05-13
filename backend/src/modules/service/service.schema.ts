@@ -30,25 +30,25 @@ export class Service {
   @Prop({ required: true, enum: ServiceCategory })
   category: ServiceCategory;
 
-  @Prop({ required: true, min: 0, name: 'unit_price' })
+  @Prop({ required: true, min: 0 })
   unitPrice: number;
 
-  @Prop({ required: true, min: 1, name: 'duration_minutes' })
+  @Prop({ required: true, min: 1 })
   durationMinutes: number;
 
-  @Prop({ required: true, min: 0, default: 15, name: 'buffer_minutes' })
+  @Prop({ required: true, min: 0, default: 15 })
   bufferMinutes: number;
 
-  @Prop({ required: true, min: 1, default: 1, name: 'slots_required' })
+  @Prop({ required: true, min: 1, default: 1 })
   slotsRequired: number;
 
   @Prop({ default: '' })
   description: string;
 
-  // @Prop({ name: 'image_url', default: null })
+  // @Prop({ default: null })
   // imageUrl?: string | null;
 
-  @Prop({ required: true, default: true, name: 'is_active' })
+  @Prop({ required: true, default: true })
   isActive: boolean;
 
   created_at?: Date;
@@ -57,8 +57,8 @@ export class Service {
 
 export const ServiceSchema = SchemaFactory.createForClass(Service);
 
-ServiceSchema.index({ code: 1 }, { unique: true });
+// ServiceSchema.index({ code: 1 }, { unique: true });
 ServiceSchema.index({ category: 1 });
-ServiceSchema.index({ is_active: 1 });
-ServiceSchema.index({ unit_price: 1 });
-ServiceSchema.index({ is_active: 1, category: 1 });
+ServiceSchema.index({ isActive: 1 });
+ServiceSchema.index({ unitPrice: 1 });
+ServiceSchema.index({ isActive: 1, category: 1 });

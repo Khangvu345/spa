@@ -38,22 +38,24 @@ Module quản lý **dịch vụ spa** (massage, các loại trị liệu). Là c
 - `code: string` (UK, regex `/^[A-Z0-9_]+$/`, 3-30 ký tự)
 - `name: string` (2-100)
 - `category: ServiceCategory` enum — SWEDISH | HOT_STONE | THAI | FOOT | NECK_SHOULDER | AROMA
-- `unitPrice: number` (VND, min 0) — DB `unit_price`
-- `durationMinutes: number` (1-480) — DB `duration_minutes`
-- `bufferMinutes: number` (0-120, default 15) — DB `buffer_minutes` — quan trọng cho Slot Availability (Booking module sẽ dùng)
-- `slotsRequired: number` (1-10, default 1) — DB `slots_required`
+- `unitPrice: number` (VND, min 0)
+- `durationMinutes: number` (1-480)
+- `bufferMinutes: number` (0-120, default 15) — quan trọng cho Slot Availability (Booking module sẽ dùng)
+- `slotsRequired: number` (1-10, default 1)
 - `description: string` (max 1000, default '')
-- `imageUrl?: string | null` — DB `image_url`
-- `isActive: boolean` (default true) — DB `is_active`
-- `created_at`, `updated_at` (timestamps)
+- `imageUrl?: string | null` (chưa enable, comment trong schema)
+- `isActive: boolean` (default true)
+- `created_at`, `updated_at` (timestamps — tên field DB snake_case do option `timestamps` của Mongoose)
+
+> **Convention:** DB field theo camelCase (= schema path). Không dùng `@Prop({ name: 'snake_case' })` vì option đó không phải option Mongoose hợp lệ — bị bỏ qua âm thầm và gây bug filter (xem log 002).
 
 ### Indexes
 
 - `{ code: 1 }` unique
 - `{ category: 1 }`
-- `{ is_active: 1 }`
-- `{ unit_price: 1 }`
-- `{ is_active: 1, category: 1 }` (compound)
+- `{ isActive: 1 }`
+- `{ unitPrice: 1 }`
+- `{ isActive: 1, category: 1 }` (compound)
 
 ### Seed data
 
@@ -83,3 +85,4 @@ Module quản lý **dịch vụ spa** (massage, các loại trị liệu). Là c
 | File | Ngày | Dev | Tóm tắt |
 |---|---|---|---|
 | [2026-05-13_001_Khanh](2026-05-13_001_Khanh.md) | 2026-05-13 | Khanh | Scaffold module Service: schema (ERD-compliant), 4 DTO, service+controller, seed 6 dịch vụ |
+| [2026-05-13_002_Khanh](2026-05-13_002_Khanh.md) | 2026-05-13 | Khanh | Fix GET /services trả rỗng: filter dùng camelCase, đồng bộ schema + index |
