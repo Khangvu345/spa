@@ -9,6 +9,7 @@
 
 | Ngày | # | Dev | Module | Issue | Tóm tắt | Code? | Link |
 |---|---|---|---|---|---|---|---|
+| 2026-05-13 | 001 | Khanh | service | [#05](issues/05.md) | Scaffold module Service CRUD + seed 6 dịch vụ | ⚠️ | [log](modules/service/2026-05-13_001_Khanh.md) |
 | 2026-05-12 | 001 | Khang | auth | [#02](issues/02.md) | Implement auth core JWT/RBAC + Staff schema | ⚠️ | [log](modules/auth/2026-05-12_001_Khang.md) |
 |---|---|---|---|---|---|---|---|
 
@@ -18,11 +19,13 @@
 
 > Cập nhật thủ công hoặc bỏ qua nếu không cần.
 
-- **Tổng logs:** 1
+- **Tổng logs:** 2
 - **Per-dev:**
   - Khang: 1 log
+  - Khanh: 1 log
 - **Per-module:**
   - auth: 1 log
+  - service: 1 log
 
 ---
 
