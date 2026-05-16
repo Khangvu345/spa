@@ -8,6 +8,7 @@ import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { MustChangePasswordGuard } from './modules/auth/guards/must-change-password.guard';
 import { RolesGuard } from './modules/auth/guards/roles.guard';
 import { HealthModule } from './modules/health/health.module';
+import { ServiceModule } from './modules/service/service.module';
 
 /**
  * Root module của backend.
@@ -28,6 +29,7 @@ import { HealthModule } from './modules/health/health.module';
     }),
     AuthModule,
     HealthModule,
+    ServiceModule,
   ],
   providers: [
     {
