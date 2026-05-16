@@ -1,7 +1,7 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiNoContentResponse,
+  ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
@@ -10,6 +10,7 @@ import { AuthResponseDto } from './dto/auth-response.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { Public } from './decorators/public.decorator';
+import { SkipPasswordChange } from './decorators/skip-password-change.decorator';
 import { AuthService } from './auth.service';
 import type { AuthenticatedUser } from './interfaces/authenticated-user.interface';
 
@@ -26,6 +27,7 @@ export class AuthController {
   }
 
   @Get('me')
+  @SkipPasswordChange()
   @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Lấy thông tin staff hiện tại' })
   getMe(@CurrentUser() user: AuthenticatedUser) {
@@ -33,14 +35,17 @@ export class AuthController {
   }
 
   @Post('change-password')
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @SkipPasswordChange()
   @ApiBearerAuth('access-token')
-  @ApiNoContentResponse({ description: 'Đổi mật khẩu thành công' })
+  @ApiOkResponse({
+    type: AuthResponseDto,
+    description: 'Đổi mật khẩu thành công',
+  })
   @ApiOperation({ summary: 'Đổi mật khẩu của chính staff đang đăng nhập' })
   changePassword(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: ChangePasswordDto,
-  ): Promise<void> {
+  ): Promise<AuthResponseDto> {
     return this.authService.changePassword(user.id, dto);
   }
 }

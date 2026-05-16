@@ -12,6 +12,9 @@
 | 2026-05-13 | 002 | Khanh | service | [#05](issues/05.md) | Fix GET /services trả rỗng do filter snake_case không khớp DB camelCase | ⚠️ | [log](modules/service/2026-05-13_002_Khanh.md) |
 | 2026-05-13 | 001 | Khanh | service | [#05](issues/05.md) | Scaffold module Service CRUD + seed 6 dịch vụ | ⚠️ | [log](modules/service/2026-05-13_001_Khanh.md) |
 | 2026-05-12 | 001 | Khang | auth | [#02](issues/02.md) | Implement auth core JWT/RBAC + Staff schema | ⚠️ | [log](modules/auth/2026-05-12_001_Khang.md) |
+| 2026-05-16 | 001 | Khang | employee/employee | [#04](issues/04.md) | Triển khai quản lý tài khoản issue #04 | ⚠️ | [log](modules/employee/employee/2026-05-16_001_Khang.md) |
+| 2026-05-13 | 001 | Khang | employee/employee | [#03](issues/03.md) | Triển khai CRUD nhân viên trên Staff schema | ⚠️ | [log](modules/employee/employee/2026-05-13_001_Khang.md) |
+| 2026-05-12 | 001 | Khang | auth | [#02](issues/02.md) | Triển khai auth core JWT/RBAC và Staff schema | ⚠️ | [log](modules/auth/2026-05-12_001_Khang.md) |
 |---|---|---|---|---|---|---|---|
 
 ---
@@ -27,6 +30,10 @@
 - **Per-module:**
   - auth: 1 log
   - service: 2 logs
+  - Khang: 3 logs
+- **Per-module:**
+  - auth: 1 log
+  - employee/employee: 2 logs
 
 ---
 
