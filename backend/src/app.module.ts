@@ -9,6 +9,7 @@ import { MustChangePasswordGuard } from './modules/auth/guards/must-change-passw
 import { RolesGuard } from './modules/auth/guards/roles.guard';
 import { HealthModule } from './modules/health/health.module';
 import { ServiceModule } from './modules/service/service.module';
+import { SupplierModule } from './modules/supplier/supplier.module';
 
 /**
  * Root module của backend.
@@ -30,6 +31,7 @@ import { ServiceModule } from './modules/service/service.module';
     AuthModule,
     HealthModule,
     ServiceModule,
+    SupplierModule,
   ],
   providers: [
     {
