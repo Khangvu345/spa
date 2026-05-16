@@ -9,6 +9,7 @@
 
 | Ngày | # | Dev | Module | Issue | Tóm tắt | Code? | Link |
 |---|---|---|---|---|---|---|---|
+| 2026-05-14 | 002 | Khanh | material | [#07](issues/07.md) | Scaffold module Material CRUD + seed 15 vật liệu | ⚠️ | [log](modules/material/2026-05-14_002_Khanh.md) |
 | 2026-05-14 | 001 | Khang | supplier | [#06](issues/06.md) | Scaffold module Supplier CRUD + seed 5 NCC | ⚠️ | [log](modules/supplier/2026-05-14_001_Khanh.md) |
 | 2026-05-13 | 002 | Khanh | service | [#05](issues/05.md) | Fix GET /services trả rỗng do filter snake_case không khớp DB camelCase | ⚠️ | [log](modules/service/2026-05-13_002_Khanh.md) |
 | 2026-05-13 | 001 | Khanh | service | [#05](issues/05.md) | Scaffold module Service CRUD + seed 6 dịch vụ | ⚠️ | [log](modules/service/2026-05-13_001_Khanh.md) |

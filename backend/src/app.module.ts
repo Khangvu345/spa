@@ -9,6 +9,7 @@ import { MustChangePasswordGuard } from './modules/auth/guards/must-change-passw
 import { RolesGuard } from './modules/auth/guards/roles.guard';
 import { HealthModule } from './modules/health/health.module';
 import { ServiceModule } from './modules/service/service.module';
+import { MaterialModule } from './modules/material/material.module';
 import { SupplierModule } from './modules/supplier/supplier.module';
 
 /**
@@ -32,6 +33,7 @@ import { SupplierModule } from './modules/supplier/supplier.module';
     HealthModule,
     ServiceModule,
     SupplierModule,
+    MaterialModule,
   ],
   providers: [
     {
