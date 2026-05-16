@@ -33,9 +33,9 @@ Module Authentication core cho staff: đăng nhập JWT, lấy profile hiện t�
 
 | Method | Path | Mô tả |
 |---|---|---|
-| POST | `/auth/login` | Staff login bằng email/password, public, trả JWT + StaffResponseDto |
+| POST | `/auth/login` | Staff đăng nhập bằng email/password, public, trả JWT + StaffResponseDto |
 | GET | `/auth/me` | Lấy thông tin staff hiện tại từ JWT |
-| POST | `/auth/change-password` | Staff tự đổi mật khẩu, verify current password, trả 204 |
+| POST | `/auth/change-password` | Staff tự đổi mật khẩu, xác thực mật khẩu hiện tại, trả JWT mới |
 
 ### Schema fields chính
 
@@ -54,9 +54,12 @@ Module Authentication core cho staff: đăng nhập JWT, lấy profile hiện t�
 ### Quyết định kỹ thuật quan trọng
 
 - Global guard bật ở `AppModule`: JWT mặc định bắt buộc cho toàn app, endpoint public phải dùng `@Public()`.
+- Global guard thứ tự hiện tại: `JwtAuthGuard` → `MustChangePasswordGuard` → `RolesGuard`.
 - Login chỉ check `account_status === ACTIVE`; không check `work_status`, nên staff `ON_LEAVE` vẫn login được.
 - Login chống timing attack bằng dummy bcrypt hash khi email không tồn tại.
 - `StaffResponseDto` là tín hiệu duy nhất cho FE về `mustChangePassword`; không tạo endpoint riêng.
+- `MustChangePasswordGuard` block mọi endpoint khi token có `mustChangePassword=true`, ngoại trừ endpoint public, `GET /auth/me`, và `POST /auth/change-password`.
+- `/auth/change-password` trả `AuthResponseDto` mới sau khi DB set `mustChangePassword=false` để FE thay token cũ còn claim `mustChangePassword=true`.
 - Không tạo `POST /auth/logout`; client tự xóa stateless JWT.
 - Health endpoint được đánh dấu `@Public()` để vẫn dùng smoke check khi global guard bật.
 - DNS config cho MongoDB Atlas SRV được tách vào `config/dns.config.ts` để cả app runtime và `seed-admin` cùng dùng.
@@ -65,7 +68,7 @@ Module Authentication core cho staff: đăng nhập JWT, lấy profile hiện t�
 
 - [x] Postman smoke test đầy đủ các case trong issue #02 với DB dev.
 - [ ] Issue #03 implement Employee CRUD, không sửa Staff schema nền.
-- [ ] Issue #04 implement admin reset password/lock/unlock, không sửa Staff schema nền.
+- [x] Issue #04 triển khai admin reset mật khẩu/khóa/mở khóa, không sửa Staff schema nền.
 - [ ] PR riêng update skill thêm section "Action Endpoints Pattern" như issue #02 ghi chú.
 
 ---
@@ -74,4 +77,4 @@ Module Authentication core cho staff: đăng nhập JWT, lấy profile hiện t�
 
 | File | Ngày | Dev | Tóm tắt |
 |---|---|---|---|
-| [2026-05-12_001_Khang](2026-05-12_001_Khang.md) | 2026-05-12 | Khang | Implement auth core JWT/RBAC + Staff schema |
+| [2026-05-12_001_Khang](2026-05-12_001_Khang.md) | 2026-05-12 | Khang | Triển khai auth core JWT/RBAC và Staff schema |

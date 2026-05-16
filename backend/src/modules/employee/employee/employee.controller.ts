@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -9,8 +10,10 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { ParseObjectIdPipe } from '../../../common/pipes/parse-objectid.pipe';
 import { Roles } from '../../auth/decorators/roles.decorator';
+import type { AuthenticatedUser } from '../../auth/interfaces/authenticated-user.interface';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { QueryEmployeeDto } from './dto/query-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
@@ -56,5 +59,44 @@ export class EmployeeController {
     @Body() dto: UpdateEmployeeDto,
   ) {
     return this.employeeService.update(id, dto);
+  }
+
+  @Post(':id/reset-password')
+  @Roles(StaffRole.ADMIN)
+  @ApiOperation({
+    summary: 'Admin reset mật khẩu nhân viên về giá trị mặc định',
+  })
+  resetPassword(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @CurrentUser() adminUser: AuthenticatedUser,
+  ) {
+    return this.employeeService.resetPassword(id, adminUser);
+  }
+
+  @Post(':id/lock')
+  @Roles(StaffRole.ADMIN)
+  @ApiOperation({ summary: 'Khóa tài khoản nhân viên' })
+  lockAccount(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @CurrentUser() adminUser: AuthenticatedUser,
+  ) {
+    return this.employeeService.lockAccount(id, adminUser);
+  }
+
+  @Post(':id/unlock')
+  @Roles(StaffRole.ADMIN)
+  @ApiOperation({ summary: 'Mở khóa tài khoản nhân viên' })
+  unlockAccount(@Param('id', ParseObjectIdPipe) id: string) {
+    return this.employeeService.unlockAccount(id);
+  }
+
+  @Delete(':id')
+  @Roles(StaffRole.ADMIN)
+  @ApiOperation({ summary: 'Xóa mềm tài khoản nhân viên sau 30 ngày khóa' })
+  deleteAccount(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @CurrentUser() adminUser: AuthenticatedUser,
+  ) {
+    return this.employeeService.deleteAccount(id, adminUser);
   }
 }

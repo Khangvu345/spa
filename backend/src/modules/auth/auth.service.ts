@@ -9,6 +9,7 @@ import * as bcrypt from 'bcrypt';
 import { BCRYPT_SALT_ROUNDS } from '../../shared/constants/business-rules';
 import { ERROR_CODES } from '../../shared/constants/error-codes';
 import { EmployeeService } from '../employee/employee/employee.service';
+import { StaffResponseDto } from '../employee/employee/dto/staff-response.dto';
 import { AccountStatus } from '../employee/employee/staff.schema';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -50,16 +51,7 @@ export class AuthService {
     }
 
     const user = this.employeeService.mapToResponse(staff);
-    const payload: JwtPayload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    };
-
-    return {
-      user,
-      accessToken: await this.jwtService.signAsync(payload),
-    };
+    return this.buildAuthResponse(user);
   }
 
   /**
@@ -78,11 +70,14 @@ export class AuthService {
    *
    * @param staffId - Mongo ObjectId của staff đang đăng nhập
    * @param dto - Mật khẩu hiện tại và mật khẩu mới
-   * @returns void
+   * @returns Thông tin staff và access token mới
    * @throws UnauthorizedException - Current password sai
    * @throws BadRequestException - New password trùng current password
    */
-  async changePassword(staffId: string, dto: ChangePasswordDto): Promise<void> {
+  async changePassword(
+    staffId: string,
+    dto: ChangePasswordDto,
+  ): Promise<AuthResponseDto> {
     const staff = await this.employeeService.findByIdOrThrow(staffId);
     const isCurrentPasswordValid = await bcrypt.compare(
       dto.currentPassword,
@@ -112,6 +107,28 @@ export class AuthService {
         BCRYPT_SALT_ROUNDS,
     );
     const passwordHash = await bcrypt.hash(dto.newPassword, saltRounds);
-    await this.employeeService.updatePassword(staffId, passwordHash);
+    const updatedStaff = await this.employeeService.updatePassword(
+      staffId,
+      passwordHash,
+    );
+    const user = this.employeeService.mapToResponse(updatedStaff);
+
+    return this.buildAuthResponse(user);
+  }
+
+  private async buildAuthResponse(
+    user: StaffResponseDto,
+  ): Promise<AuthResponseDto> {
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+      mustChangePassword: user.mustChangePassword,
+    };
+
+    return {
+      user,
+      accessToken: await this.jwtService.signAsync(payload),
+    };
   }
 }

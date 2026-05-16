@@ -1,9 +1,21 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  Optional,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 import { Model, Types } from 'mongoose';
-import { BCRYPT_SALT_ROUNDS } from '../../../shared/constants/business-rules';
+import {
+  ACCOUNT_DELETE_AFTER_LOCK_DAYS,
+  BCRYPT_SALT_ROUNDS,
+  DEFAULT_RESET_PASSWORD,
+} from '../../../shared/constants/business-rules';
 import { ERROR_CODES } from '../../../shared/constants/error-codes';
+import type { AuthenticatedUser } from '../../auth/interfaces/authenticated-user.interface';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { EmployeeResponseDto } from './dto/employee-response.dto';
 import {
@@ -15,12 +27,18 @@ import {
 } from './dto/query-employee.dto';
 import { StaffResponseDto } from './dto/staff-response.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
-import { AccountStatus, Staff, StaffDocument, WorkStatus } from './staff.schema';
+import {
+  AccountStatus,
+  Staff,
+  StaffDocument,
+  WorkStatus,
+} from './staff.schema';
 
 @Injectable()
 export class EmployeeService {
   constructor(
     @InjectModel(Staff.name) private readonly staffModel: Model<StaffDocument>,
+    @Optional() private readonly configService?: ConfigService,
   ) {}
 
   /**
@@ -74,7 +92,10 @@ export class EmployeeService {
     const filter: Record<string, unknown> = {};
 
     if (query.search?.trim()) {
-      const searchRegex = new RegExp(this.escapeRegex(query.search.trim()), 'i');
+      const searchRegex = new RegExp(
+        this.escapeRegex(query.search.trim()),
+        'i',
+      );
       filter.$or = [{ fullName: searchRegex }, { email: searchRegex }];
     }
 
@@ -137,10 +158,17 @@ export class EmployeeService {
     id: string,
     dto: UpdateEmployeeDto,
   ): Promise<EmployeeResponseDto> {
-    const updatePayload: Partial<Pick<
-      Staff,
-      'fullName' | 'phone' | 'role' | 'baseSalary' | 'startedAt' | 'workStatus'
-    >> = {};
+    const updatePayload: Partial<
+      Pick<
+        Staff,
+        | 'fullName'
+        | 'phone'
+        | 'role'
+        | 'baseSalary'
+        | 'startedAt'
+        | 'workStatus'
+      >
+    > = {};
 
     if (dto.fullName !== undefined) {
       updatePayload.fullName = dto.fullName;
@@ -175,6 +203,155 @@ export class EmployeeService {
     return this.mapToEmployeeResponse(updated);
   }
 
+  async resetPassword(
+    staffId: string,
+    adminUser: AuthenticatedUser,
+  ): Promise<void> {
+    const staff = await this.findByIdOrThrow(staffId);
+    this.ensureStaffNotDeleted(staff);
+
+    const passwordHash = await bcrypt.hash(
+      this.getDefaultResetPassword(),
+      this.getBcryptSaltRounds(),
+    );
+    const updated = await this.staffModel
+      .findByIdAndUpdate(staffId, {
+        passwordHash,
+        mustChangePassword: true,
+      })
+      .exec();
+
+    if (!updated) {
+      throw new NotFoundException({
+        code: ERROR_CODES.STAFF_NOT_FOUND,
+        message: 'Nhân viên không tồn tại',
+      });
+    }
+
+    console.log(
+      `[kiểm toán] Admin ${adminUser.id} reset mật khẩu cho nhân viên ${staffId}`,
+    );
+  }
+
+  async lockAccount(
+    staffId: string,
+    adminUser: AuthenticatedUser,
+  ): Promise<EmployeeResponseDto> {
+    this.ensureNotSelf(staffId, adminUser);
+
+    const staff = await this.findByIdOrThrow(staffId);
+    this.ensureStaffNotDeleted(staff);
+
+    if (staff.accountStatus === AccountStatus.LOCKED) {
+      throw new BadRequestException({
+        code: ERROR_CODES.STAFF_ALREADY_LOCKED,
+        message: 'Tài khoản nhân viên đã bị khóa',
+      });
+    }
+
+    const updated = await this.staffModel
+      .findByIdAndUpdate(
+        staffId,
+        {
+          accountStatus: AccountStatus.LOCKED,
+          lockedAt: new Date(),
+        },
+        { new: true },
+      )
+      .exec();
+
+    if (!updated) {
+      throw new NotFoundException({
+        code: ERROR_CODES.STAFF_NOT_FOUND,
+        message: 'Nhân viên không tồn tại',
+      });
+    }
+
+    return this.mapToEmployeeResponse(updated);
+  }
+
+  async unlockAccount(staffId: string): Promise<EmployeeResponseDto> {
+    const staff = await this.findByIdOrThrow(staffId);
+    this.ensureStaffNotDeleted(staff);
+
+    if (staff.accountStatus !== AccountStatus.LOCKED) {
+      throw new BadRequestException({
+        code: ERROR_CODES.STAFF_NOT_LOCKED,
+        message: 'Tài khoản nhân viên chưa bị khóa',
+      });
+    }
+
+    const updated = await this.staffModel
+      .findByIdAndUpdate(
+        staffId,
+        {
+          accountStatus: AccountStatus.ACTIVE,
+          lockedAt: null,
+        },
+        { new: true },
+      )
+      .exec();
+
+    if (!updated) {
+      throw new NotFoundException({
+        code: ERROR_CODES.STAFF_NOT_FOUND,
+        message: 'Nhân viên không tồn tại',
+      });
+    }
+
+    return this.mapToEmployeeResponse(updated);
+  }
+
+  async deleteAccount(
+    staffId: string,
+    adminUser: AuthenticatedUser,
+  ): Promise<void> {
+    this.ensureNotSelf(staffId, adminUser);
+
+    const staff = await this.findByIdOrThrow(staffId);
+    this.ensureStaffNotDeleted(staff);
+
+    if (staff.accountStatus !== AccountStatus.LOCKED) {
+      throw new BadRequestException({
+        code: ERROR_CODES.STAFF_NOT_LOCKED,
+        message: 'Tài khoản nhân viên chưa bị khóa',
+      });
+    }
+
+    if (!staff.lockedAt) {
+      throw new BadRequestException({
+        code: ERROR_CODES.LOCK_DURATION_NOT_MET,
+        message: 'Tài khoản chưa bị khóa đủ số ngày quy định',
+      });
+    }
+
+    const now = Date.now();
+    const lockedForMs = now - staff.lockedAt.getTime();
+    const requiredMs =
+      this.getAccountDeleteAfterLockDays() * 24 * 60 * 60 * 1000;
+
+    if (lockedForMs < requiredMs) {
+      throw new BadRequestException({
+        code: ERROR_CODES.LOCK_DURATION_NOT_MET,
+        message: 'Tài khoản chưa bị khóa đủ số ngày quy định',
+      });
+    }
+
+    const updated = await this.staffModel
+      .findByIdAndUpdate(staffId, {
+        accountStatus: AccountStatus.DELETED,
+        email: `${staff.email}.deleted.${now}`,
+      })
+      .exec();
+
+    if (!updated) {
+      throw new NotFoundException({
+        code: ERROR_CODES.STAFF_NOT_FOUND,
+        message: 'Nhân viên không tồn tại',
+      });
+    }
+  }
+
   /**
    * Tìm nhân viên theo email để phục vụ login.
    *
@@ -182,7 +359,9 @@ export class EmployeeService {
    * @returns Staff document hoặc null nếu không tồn tại
    */
   async findByEmail(email: string): Promise<StaffDocument | null> {
-    return this.staffModel.findOne({ email: email.toLowerCase().trim() }).exec();
+    return this.staffModel
+      .findOne({ email: email.toLowerCase().trim() })
+      .exec();
   }
 
   /**
@@ -221,12 +400,19 @@ export class EmployeeService {
    * @returns void
    * @throws NotFoundException - Không tìm thấy staff
    */
-  async updatePassword(id: string, passwordHash: string): Promise<void> {
+  async updatePassword(
+    id: string,
+    passwordHash: string,
+  ): Promise<StaffDocument> {
     const updated = await this.staffModel
-      .findByIdAndUpdate(id, {
-        passwordHash,
-        mustChangePassword: false,
-      })
+      .findByIdAndUpdate(
+        id,
+        {
+          passwordHash,
+          mustChangePassword: false,
+        },
+        { new: true },
+      )
       .exec();
 
     if (!updated) {
@@ -235,6 +421,8 @@ export class EmployeeService {
         message: 'Nhân viên không tồn tại',
       });
     }
+
+    return updated;
   }
 
   /**
@@ -276,6 +464,57 @@ export class EmployeeService {
       createdAt: doc.created_at?.toISOString() ?? '',
       updatedAt: doc.updated_at?.toISOString() ?? '',
     };
+  }
+
+  private ensureNotSelf(staffId: string, adminUser: AuthenticatedUser): void {
+    if (staffId !== adminUser.id) {
+      return;
+    }
+
+    throw new BadRequestException({
+      code: ERROR_CODES.CANNOT_OPERATE_SELF,
+      message: 'Không thể khóa hoặc xóa tài khoản của chính mình',
+    });
+  }
+
+  private ensureStaffNotDeleted(staff: StaffDocument): void {
+    if (staff.accountStatus !== AccountStatus.DELETED) {
+      return;
+    }
+
+    throw new BadRequestException({
+      code: ERROR_CODES.STAFF_ALREADY_DELETED,
+      message: 'Tài khoản nhân viên đã bị xóa',
+    });
+  }
+
+  private getBcryptSaltRounds(): number {
+    const configuredValue = Number(
+      this.configService?.get<string>('BCRYPT_SALT_ROUNDS') ??
+        BCRYPT_SALT_ROUNDS,
+    );
+
+    return Number.isFinite(configuredValue)
+      ? configuredValue
+      : BCRYPT_SALT_ROUNDS;
+  }
+
+  private getDefaultResetPassword(): string {
+    return (
+      this.configService?.get<string>('DEFAULT_RESET_PASSWORD') ??
+      DEFAULT_RESET_PASSWORD
+    );
+  }
+
+  private getAccountDeleteAfterLockDays(): number {
+    const configuredValue = Number(
+      this.configService?.get<string>('ACCOUNT_DELETE_AFTER_LOCK_DAYS') ??
+        ACCOUNT_DELETE_AFTER_LOCK_DAYS,
+    );
+
+    return Number.isFinite(configuredValue) && configuredValue >= 0
+      ? configuredValue
+      : ACCOUNT_DELETE_AFTER_LOCK_DAYS;
   }
 
   private escapeRegex(value: string): string {
