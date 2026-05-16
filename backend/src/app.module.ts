@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { getDatabaseConfig } from './config/database.config';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
+import { MustChangePasswordGuard } from './modules/auth/guards/must-change-password.guard';
 import { RolesGuard } from './modules/auth/guards/roles.guard';
 import { HealthModule } from './modules/health/health.module';
 
@@ -16,7 +17,7 @@ import { HealthModule } from './modules/health/health.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,   // không cần import ConfigModule ở từng module con
+      isGlobal: true, // không cần import ConfigModule ở từng module con
       envFilePath: '.env',
     }),
 
@@ -32,6 +33,10 @@ import { HealthModule } from './modules/health/health.module';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: MustChangePasswordGuard,
     },
     {
       provide: APP_GUARD,
