@@ -16,6 +16,8 @@
     "seed:services": "ts-node -r tsconfig-paths/register src/scripts/seed-services.ts",
     "seed:suppliers": "ts-node -r tsconfig-paths/register src/scripts/seed-suppliers.ts",
     "seed:materials": "ts-node -r tsconfig-paths/register src/scripts/seed-materials.ts",
+    "seed:staff": "ts-node -r tsconfig-paths/register src/scripts/seed-staff.ts",
+    "migrate:staff-role-operator": "ts-node -r tsconfig-paths/register src/scripts/migrate-staff-role-operator.ts",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",

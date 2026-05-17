@@ -50,7 +50,7 @@ export class QueryEmployeeDto {
   @IsString({ message: 'Từ khóa tìm kiếm phải là chuỗi' })
   search?: string;
 
-  @ApiPropertyOptional({ enum: StaffRole, example: StaffRole.STAFF })
+  @ApiPropertyOptional({ enum: StaffRole, example: StaffRole.OPERATOR })
   @IsOptional()
   @IsEnum(StaffRole, { message: 'Vai trò không hợp lệ' })
   role?: StaffRole;

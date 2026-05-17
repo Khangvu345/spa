@@ -16,6 +16,7 @@ Module quản lý **nhà cung cấp (Supplier)** — nguồn cung vật liệu c
 - **Code:** `backend/src/modules/supplier/`
 - **Seed script:** `backend/src/scripts/seed-suppliers.ts` (`npm run seed:suppliers`)
 - **Issue gốc:** [#06](../../issues/06.md)
+- **Issue role refactor:** [#08](../../issues/08.md)
 - **Related modules:** auth (Roles/JwtAuthGuard), inventory/material (#07 sẽ ref `supplierId`), stock-receipt (phase 2 Kho)
 
 ---
@@ -65,7 +66,8 @@ Module quản lý **nhà cung cấp (Supplier)** — nguồn cung vật liệu c
 
 - **Không duplicate-check `name`** — vì 1 công ty có thể có nhiều chi nhánh, hoặc 2 supplier khác nhau cùng tên. Chỉ unique check trên `taxCode` (nếu có giá trị) — trả 409 `SUPPLIER_TAX_CODE_EXISTS`.
 - **`email`, `taxCode` optional** — validate format chỉ khi có giá trị. Default `''` lưu DB cho gọn (tránh field không tồn tại).
-- **GET list cho mọi role JWT** (không chỉ ADMIN) — vì receptionist/staff có thể cần tra cứu supplier. ADMIN-only chỉ cho POST/PATCH.
+- **GET list cho mọi role JWT** (không chỉ ADMIN) — vì operator/staff có thể cần tra cứu supplier. ADMIN-only chỉ cho POST/PATCH.
+- Role vận hành dùng `OPERATOR`; `RECEPTIONIST`/`CASHIER` chỉ còn là dữ liệu cũ cần migrate theo issue #08.
 - **Không expose DELETE** — soft delete qua `isActive=false`. Lý do: tránh broken ref khi Material/StockReceipt tham chiếu supplier.
 - **Phone 10 số VN** — `Matches(/^[0-9]{10}$/)`. Chưa support format quốc tế `+84`.
 - **Sort fields:** chỉ cho `name` và `createdAt` (theo Issue #06). Default `createdAt desc`.
@@ -86,4 +88,5 @@ Module quản lý **nhà cung cấp (Supplier)** — nguồn cung vật liệu c
 
 | File | Ngày | Dev | Tóm tắt |
 |---|---|---|---|
+| [2026-05-17_001_Khang](../auth/2026-05-17_001_Khang.md) | 2026-05-17 | Khang | Refactor role vận hành về OPERATOR + seed staff demo |
 | [2026-05-14_001_Khanh](2026-05-14_001_Khanh.md) | 2026-05-14 | Khang | Scaffold module Supplier: schema + 4 DTO + service/controller + seed 5 NCC |

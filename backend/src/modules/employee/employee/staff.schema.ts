@@ -5,8 +5,7 @@ export type StaffDocument = HydratedDocument<Staff>;
 
 export enum StaffRole {
   ADMIN = 'ADMIN',
-  RECEPTIONIST = 'RECEPTIONIST',
-  CASHIER = 'CASHIER',
+  OPERATOR = 'OPERATOR',
   STAFF = 'STAFF',
 }
 

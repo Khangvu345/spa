@@ -33,7 +33,7 @@ export class CreateEmployeeDto {
   @MaxLength(128, { message: 'Mật khẩu không được vượt quá 128 ký tự' })
   password: string;
 
-  @ApiProperty({ enum: StaffRole, example: StaffRole.STAFF })
+  @ApiProperty({ enum: StaffRole, example: StaffRole.OPERATOR })
   @IsEnum(StaffRole, { message: 'Vai trò không hợp lệ' })
   role: StaffRole;
 

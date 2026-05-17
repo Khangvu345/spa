@@ -16,6 +16,7 @@ Module quản lý **vật liệu (Material)** — kho vật tư tiêu hao và kh
 - **Code:** `backend/src/modules/material/`
 - **Seed script:** `backend/src/scripts/seed-materials.ts` (`npm run seed:materials`)
 - **Issue gốc:** [#07](../../issues/07.md)
+- **Issue role refactor:** [#08](../../issues/08.md)
 - **Related modules:** auth (Roles/JwtAuthGuard), supplier (#06 — ref `supplierId`), service-material (BOM, phase 2), stock_receipt / stock_issue (phase 2 Kho)
 
 ---
@@ -60,6 +61,7 @@ Module quản lý **vật liệu (Material)** — kho vật tư tiêu hao và kh
 ### Seed data
 
 15 vật liệu (Issue #07 mục E + 2 bonus: `TOWEL_BATH`, `INCENSE_STICK` để đủ 15 cover 6 dịch vụ massage):
+
 - 4 tinh dầu (`OIL_*`) — supplier Hương Việt
 - 3 vật tư y tế / đồng phục (`PAPER_BED`, `ALCOHOL_MEDICAL`, `UNIFORM_THAI`, `TOWEL_BATH`) — supplier Minh Anh
 - 2 thảo mộc (`BALM_PAIN_RELIEF`, `BAG_HERBAL_COMPRESS`) — supplier Thảo Mộc Việt
@@ -83,7 +85,8 @@ Seed idempotent qua `updateOne({code}, {$setOnInsert: {...}}, {upsert: true})`. 
 - **`code` auto uppercase + trim** — convention tránh duplicate `oil_olive` vs `OIL_OLIVE`. Validation regex `^[A-Z0-9_]+$` cho phép input chữ HOA, service auto-upper trước khi insert/check duplicate.
 - **DEPRECIATION require `expectedUsesPerUnit > 0`** — check ở cả CREATE và UPDATE (khi đổi `type` sang DEPRECIATION hoặc khi đang DEPRECIATION mà set expectedUsesPerUnit về 0/null).
 - **Populate supplier khi GET** — list và detail đều populate `supplierId` → `{ id, name }` (chỉ trả 2 field name, không expose full supplier). FE hiển thị tên NCC không cần gọi thêm API.
-- **GET list cho mọi role JWT** — receptionist/staff cần tra cứu material (vd: chuẩn bị ca massage). POST/PATCH chỉ ADMIN.
+- **GET list cho mọi role JWT** — operator/staff cần tra cứu material (vd: chuẩn bị ca massage). POST/PATCH chỉ ADMIN.
+- Role vận hành dùng `OPERATOR`; `RECEPTIONIST`/`CASHIER` chỉ còn là dữ liệu cũ cần migrate theo issue #08.
 - **Không expose DELETE** — soft delete qua `isActive=false`. Lý do: BOM (service_materials) và stock history (phase 2) ref materialId.
 - **PATCH cho phép sửa `stockQuantity` thủ công** — tạm cho MVP. Sau khi `stock_ledger` có → REMOVE khỏi UpdateMaterialDto, ép qua endpoint nhập kho riêng.
 - **Default `limit = 10`** override `DEFAULT_LIMIT = 20` (giống pattern Supplier) — theo Issue #07 mục QueryMaterialDto.
@@ -103,4 +106,5 @@ Seed idempotent qua `updateOne({code}, {$setOnInsert: {...}}, {upsert: true})`. 
 
 | File | Ngày | Dev | Tóm tắt |
 |---|---|---|---|
+| [2026-05-17_001_Khang](../auth/2026-05-17_001_Khang.md) | 2026-05-17 | Khang | Refactor role vận hành về OPERATOR + seed staff demo |
 | [2026-05-14_002_Khanh](2026-05-14_002_Khanh.md) | 2026-05-14 | Khanh | Scaffold module Material: schema + 4 DTO + service/controller + seed 15 vật liệu |

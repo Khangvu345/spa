@@ -22,6 +22,7 @@ Module này phục vụ admin tạo/cập nhật nhân viên, mọi role đã lo
 
 - **Code:** `src/modules/employee/employee`
 - **API spec:** Swagger `/api-docs`
+- **Issue role refactor:** [#08](../../../issues/08.md)
 - **Related modules:** `auth`
 
 ---
@@ -47,6 +48,7 @@ Module này phục vụ admin tạo/cập nhật nhân viên, mọi role đã lo
 - Không sửa schema trong issue #03/#04.
 - Field account/password nhạy cảm: `passwordHash` không bao giờ trả response; PATCH employee không apply `email`, `password`, `accountStatus`.
 - Issue #04 dùng lại `accountStatus`, `lockedAt`, `mustChangePassword` có sẵn trong Staff schema.
+- Role hiện còn 3 giá trị: `ADMIN | OPERATOR | STAFF`; `OPERATOR` gộp lễ tân và thu ngân.
 
 ### Quyết định kỹ thuật quan trọng
 
@@ -58,6 +60,8 @@ Module này phục vụ admin tạo/cập nhật nhân viên, mọi role đã lo
 - Admin không được lock/delete chính mình; service trả `CANNOT_OPERATE_SELF`.
 - Soft delete không xóa physical record, chỉ set `accountStatus=DELETED` và đổi email sang `original@email.com.deleted.<timestamp>` để giải phóng unique email.
 - Delete yêu cầu account đã `LOCKED` và `lockedAt` đủ `ACCOUNT_DELETE_AFTER_LOCK_DAYS` ngày.
+- Nếu DB còn dữ liệu cũ `RECEPTIONIST`/`CASHIER`, chạy `npm run migrate:staff-role-operator` để chuyển sang `OPERATOR`.
+- Seed nhân viên demo theo 3 role mới chạy bằng `npm run seed:staff`.
 
 ### Pending
 
@@ -70,5 +74,6 @@ Module này phục vụ admin tạo/cập nhật nhân viên, mọi role đã lo
 
 | File | Ngày | Dev | Tóm tắt |
 |---|---|---|---|
+| [2026-05-17_001_Khang](../../auth/2026-05-17_001_Khang.md) | 2026-05-17 | Khang | Refactor role vận hành về OPERATOR + seed staff demo |
 | [2026-05-16_001_Khang](2026-05-16_001_Khang.md) | 2026-05-16 | Khang | Triển khai quản lý tài khoản issue #04 |
 | [2026-05-13_001_Khang](2026-05-13_001_Khang.md) | 2026-05-13 | Khang | Triển khai CRUD nhân viên trên Staff schema |

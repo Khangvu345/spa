@@ -21,6 +21,7 @@ Module Authentication core cho staff: đăng nhập JWT, lấy profile hiện t�
 
 - **Code:** `src/modules/auth`, `src/modules/employee/employee`
 - **API spec:** Swagger `/api-docs`
+- **Issue role refactor:** [#08](../../issues/08.md)
 - **Related modules:** `employee/employee` chứa Staff schema dùng chung cho Auth + Employee CRUD sau này
 
 ---
@@ -43,7 +44,7 @@ Module Authentication core cho staff: đăng nhập JWT, lấy profile hiện t�
 - `Staff.phone: string` → SĐT VN 10 chữ số theo DTO/issue sau
 - `Staff.email: string` → unique, dùng làm username login
 - `Staff.passwordHash: string` → Mongo `password_hash`, không expose qua response
-- `Staff.role: StaffRole` → `ADMIN | RECEPTIONIST | CASHIER | STAFF`
+- `Staff.role: StaffRole` → `ADMIN | OPERATOR | STAFF`
 - `Staff.baseSalary: number` → Mongo `base_salary`, default 0
 - `Staff.workStatus: WorkStatus` → `ACTIVE | ON_LEAVE | RESIGNED`
 - `Staff.accountStatus: AccountStatus` → `ACTIVE | LOCKED | DELETED`
@@ -63,6 +64,8 @@ Module Authentication core cho staff: đăng nhập JWT, lấy profile hiện t�
 - Không tạo `POST /auth/logout`; client tự xóa stateless JWT.
 - Health endpoint được đánh dấu `@Public()` để vẫn dùng smoke check khi global guard bật.
 - DNS config cho MongoDB Atlas SRV được tách vào `config/dns.config.ts` để cả app runtime và `seed-admin` cùng dùng.
+- Role vận hành đã gộp lễ tân và thu ngân thành `OPERATOR`; dữ liệu cũ `RECEPTIONIST`/`CASHIER` cần chạy `npm run migrate:staff-role-operator`.
+- Seed staff demo theo 3 role mới chạy bằng `npm run seed:staff`.
 
 ### Pending
 
@@ -77,4 +80,5 @@ Module Authentication core cho staff: đăng nhập JWT, lấy profile hiện t�
 
 | File | Ngày | Dev | Tóm tắt |
 |---|---|---|---|
+| [2026-05-17_001_Khang](2026-05-17_001_Khang.md) | 2026-05-17 | Khang | Refactor role vận hành về OPERATOR + seed staff demo |
 | [2026-05-12_001_Khang](2026-05-12_001_Khang.md) | 2026-05-12 | Khang | Triển khai auth core JWT/RBAC và Staff schema |
