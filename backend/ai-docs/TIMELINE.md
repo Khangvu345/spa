@@ -9,6 +9,7 @@
 
 | Ngày | # | Dev | Module | Issue | Tóm tắt | Code? | Link |
 |---|---|---|---|---|---|---|---|
+| 2026-05-19 | 001 | Khanh | service-material-bom | [#18](issues/18.md) | Scaffold module BOM CRUD + seed 15 entries định mức cho 6 dịch vụ | ⚠️ | [log](modules/service-material-bom/2026-05-19_001_Khanh.md) |
 | 2026-05-17 | 001 | Khang | auth/employee | [#08](issues/08.md) | Refactor role vận hành về OPERATOR + seed staff demo | ⚠️ | [log](modules/auth/2026-05-17_001_Khang.md) |
 | 2026-05-16 | 001 | Khang | employee/employee | [#04](issues/04.md) | Triển khai quản lý tài khoản issue #04 | ⚠️ | [log](modules/employee/employee/2026-05-16_001_Khang.md) |
 | 2026-05-14 | 002 | Khanh | material | [#07](issues/07.md) | Scaffold module Material CRUD + seed 15 vật liệu | ⚠️ | [log](modules/material/2026-05-14_002_Khanh.md) |
@@ -25,16 +26,17 @@
 
 > Cập nhật thủ công hoặc bỏ qua nếu không cần.
 
-- **Tổng logs:** 9
+- **Tổng logs:** 10
 - **Per-dev:**
   - Khang: 6 logs
-  - Khanh: 3 logs
+  - Khanh: 4 logs
 - **Per-module:**
   - auth/employee: 1 log
   - auth: 2 logs
   - employee/employee: 2 logs
   - material: 1 log
   - service: 2 logs
+  - service-material-bom: 1 log
   - supplier: 1 log
 
 ---
