@@ -16,6 +16,7 @@
     "seed:services": "ts-node -r tsconfig-paths/register src/scripts/seed-services.ts",
     "seed:suppliers": "ts-node -r tsconfig-paths/register src/scripts/seed-suppliers.ts",
     "seed:materials": "ts-node -r tsconfig-paths/register src/scripts/seed-materials.ts",
+    "seed:customers": "ts-node -r tsconfig-paths/register src/scripts/seed-customers.ts",
     "seed:staff": "ts-node -r tsconfig-paths/register src/scripts/seed-staff.ts",
     "seed:assignments": "ts-node -r tsconfig-paths/register src/scripts/seed-staff-service-assignments.ts",
     "migrate:staff-role-operator": "ts-node -r tsconfig-paths/register src/scripts/migrate-staff-role-operator.ts",
