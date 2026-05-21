@@ -9,6 +9,7 @@
 
 | Ngày | # | Dev | Module | Issue | Tóm tắt | Code? | Link |
 |---|---|---|---|---|---|---|---|
+| 2026-05-21 | 001 | Khang | service-order | [#16](issues/16.md) | Triển khai Service Order CRUD, status flow, snapshot items và smoke test | ⚠️ | [log](modules/service-order/2026-05-21_001_Khang.md) |
 | 2026-05-21 | 001 | Khang | staff-service-assignment | [#15](issues/15.md) | Triển khai staff_service_assignments schema, endpoints và seed | ⚠️ | [log](modules/staff-service-assignment/2026-05-21_001_Khang.md) |
 | 2026-05-21 | 001 | Khang | customer | [#14](issues/14.md) | Implement Customer CRUD + seed 8 khách hàng | ⚠️ | [log](modules/customer/2026-05-21_001_Khang.md) |
 | 2026-05-17 | 001 | Khang | auth/employee | [#08](issues/08.md) | Refactor role vận hành về OPERATOR + seed staff demo | ⚠️ | [log](modules/auth/2026-05-17_001_Khang.md) |
@@ -27,9 +28,9 @@
 
 > Cập nhật thủ công hoặc bỏ qua nếu không cần.
 
-- **Tổng logs:** 10
+- **Tổng logs:** 11
 - **Per-dev:**
-  - Khang: 7 logs
+  - Khang: 8 logs
   - Khanh: 3 logs
 - **Per-module:**
   - auth/employee: 1 log
@@ -38,6 +39,7 @@
   - employee/employee: 2 logs
   - material: 1 log
   - service: 2 logs
+  - service-order: 1 log
   - staff-service-assignment: 1 log
   - supplier: 1 log
 
