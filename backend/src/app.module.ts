@@ -11,6 +11,7 @@ import { HealthModule } from './modules/health/health.module';
 import { ServiceModule } from './modules/service/service.module';
 import { MaterialModule } from './modules/material/material.module';
 import { SupplierModule } from './modules/supplier/supplier.module';
+import { StaffServiceAssignmentModule } from './modules/staff-service-assignment/staff-service-assignment.module';
 import { CustomerModule } from './modules/customer/customer.module';
 
 /**
@@ -35,6 +36,7 @@ import { CustomerModule } from './modules/customer/customer.module';
     ServiceModule,
     SupplierModule,
     MaterialModule,
+    StaffServiceAssignmentModule,
     CustomerModule,
   ],
   providers: [
