@@ -11,6 +11,7 @@ import { HealthModule } from './modules/health/health.module';
 import { ServiceModule } from './modules/service/service.module';
 import { MaterialModule } from './modules/material/material.module';
 import { SupplierModule } from './modules/supplier/supplier.module';
+import { CustomerModule } from './modules/customer/customer.module';
 
 /**
  * Root module của backend.
@@ -34,6 +35,7 @@ import { SupplierModule } from './modules/supplier/supplier.module';
     ServiceModule,
     SupplierModule,
     MaterialModule,
+    CustomerModule,
   ],
   providers: [
     {
