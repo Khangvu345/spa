@@ -12,6 +12,8 @@ import { ServiceModule } from './modules/service/service.module';
 import { MaterialModule } from './modules/material/material.module';
 import { ServiceMaterialBomModule } from './modules/service-material-bom/service-material-bom.module';
 import { SupplierModule } from './modules/supplier/supplier.module';
+import { StaffServiceAssignmentModule } from './modules/staff-service-assignment/staff-service-assignment.module';
+import { CustomerModule } from './modules/customer/customer.module';
 
 /**
  * Root module của backend.
@@ -36,6 +38,8 @@ import { SupplierModule } from './modules/supplier/supplier.module';
     SupplierModule,
     MaterialModule,
     ServiceMaterialBomModule,
+    StaffServiceAssignmentModule,
+    CustomerModule,
   ],
   providers: [
     {
