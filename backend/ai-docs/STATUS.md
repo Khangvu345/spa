@@ -10,7 +10,7 @@
 | Khanh | [#05](issues/05.md) | service | [log](modules/service/2026-05-13_002_Khanh.md) | 🟡 | 2026-05-13 |
 | Khanh | [#06](issues/06.md) | supplier | [log](modules/supplier/2026-05-14_001_Khanh.md) | 🟡 | 2026-05-14 |
 | Khanh | [#07](issues/07.md) | material | [log](modules/material/2026-05-14_002_Khanh.md) | 🟡 | 2026-05-14 |
-| --- | --- | ---| --- | ---| --- |
+| Khang | [#15](issues/15.md) | staff-service-assignment | [log](modules/staff-service-assignment/2026-05-21_001_Khang.md) | 🟡 | 2026-05-21 |
 
 ---
 
