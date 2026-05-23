@@ -16,6 +16,7 @@ import { StaffServiceAssignmentModule } from './modules/staff-service-assignment
 import { CustomerModule } from './modules/customer/customer.module';
 import { StockLedgerModule } from './modules/stock-ledger/stock-ledger.module';
 import { ServiceOrderModule } from './modules/service-order/service-order.module';
+import { InvoiceModule } from './modules/invoice/invoice.module';
 import { BookingModule } from './modules/booking/booking.module';
 
 /**
@@ -45,6 +46,7 @@ import { BookingModule } from './modules/booking/booking.module';
     CustomerModule,
     StockLedgerModule,
     ServiceOrderModule,
+    InvoiceModule,
     BookingModule,
   ],
   providers: [
