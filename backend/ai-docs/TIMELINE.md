@@ -10,6 +10,7 @@
 | Ngày | # | Dev | Module | Issue | Tóm tắt | Code? | Link |
 |---|---|---|---|---|---|---|---|
 | 2026-05-23 | 001 | Khanh | stock-ledger | [#19](issues/19.md) | Scaffold module stock-ledger: schema + 6 DTO + service (transaction) + controller + helper `deductForInvoice` | ⚠️ | [log](modules/stock-ledger/2026-05-23_001_Khanh.md) |
+| 2026-05-21 | 001 | Khang | service-order | [#16](issues/16.md) | Triển khai Service Order CRUD, status flow, snapshot items và smoke test | ⚠️ | [log](modules/service-order/2026-05-21_001_Khang.md) |
 | 2026-05-19 | 001 | Khanh | service-material-bom | [#18](issues/18.md) | Scaffold module BOM CRUD + seed 15 entries định mức cho 6 dịch vụ | ⚠️ | [log](modules/service-material-bom/2026-05-19_001_Khanh.md) |
 | 2026-05-21 | 001 | Khang | staff-service-assignment | [#15](issues/15.md) | Triển khai staff_service_assignments schema, endpoints và seed | ⚠️ | [log](modules/staff-service-assignment/2026-05-21_001_Khang.md) |
 | 2026-05-21 | 001 | Khang | customer | [#14](issues/14.md) | Implement Customer CRUD + seed 8 khách hàng | ⚠️ | [log](modules/customer/2026-05-21_001_Khang.md) |
@@ -29,11 +30,9 @@
 
 > Cập nhật thủ công hoặc bỏ qua nếu không cần.
 
-- **Tổng logs:** 10
+- **Tổng logs:** 11
 - **Per-dev:**
-  - Khang: 6 logs
-  - Khanh: 4 logs
-  - Khang: 7 logs
+  - Khang: 8 logs
   - Khanh: 3 logs
 - **Per-module:**
   - auth/employee: 1 log
@@ -42,6 +41,7 @@
   - employee/employee: 2 logs
   - material: 1 log
   - service: 2 logs
+  - service-order: 1 log
   - service-material-bom: 1 log
   - staff-service-assignment: 1 log
   - supplier: 1 log
