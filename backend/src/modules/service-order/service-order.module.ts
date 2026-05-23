@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { Booking, BookingSchema } from '../booking/booking.schema';
 import { CustomerModule } from '../customer/customer.module';
 import { EmployeeModule } from '../employee/employee/employee.module';
 import { ServiceModule } from '../service/service.module';
@@ -16,6 +17,7 @@ import { ServiceOrderService } from './service-order.service';
     EmployeeModule,
     MongooseModule.forFeature([
       { name: ServiceOrder.name, schema: ServiceOrderSchema },
+      { name: Booking.name, schema: BookingSchema },
     ]),
   ],
   controllers: [ServiceOrderController],

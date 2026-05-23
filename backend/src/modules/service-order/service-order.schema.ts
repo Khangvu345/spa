@@ -125,6 +125,12 @@ export class ServiceOrder {
   @Prop({ type: Date, default: null })
   cancelledAt: Date | null;
 
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: Staff.name, default: null })
+  cancelledBy: Types.ObjectId | null;
+
+  @Prop({ type: String, default: null })
+  cancelReason: string | null;
+
   created_at?: Date;
   updated_at?: Date;
 }

@@ -4,11 +4,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { ClientSession, Model, Types } from 'mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { ClientSession, Connection, Model, Types } from 'mongoose';
 import { DEFAULT_PAGE, MAX_LIMIT } from '../../shared/constants/business-rules';
 import { ERROR_CODES } from '../../shared/constants/error-codes';
 import type { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
+import { Booking, BookingDocument, BookingStatus } from '../booking/booking.schema';
 import { CustomerService } from '../customer/customer.service';
 import { EmployeeService } from '../employee/employee/employee.service';
 import { ServiceService } from '../service/service.service';
@@ -50,6 +51,10 @@ export class ServiceOrderService {
   constructor(
     @InjectModel(ServiceOrder.name)
     private readonly serviceOrderModel: Model<ServiceOrderDocument>,
+    @InjectModel(Booking.name)
+    private readonly bookingModel: Model<BookingDocument>,
+    @InjectConnection()
+    private readonly connection: Connection,
     private readonly customerService: CustomerService,
     private readonly serviceService: ServiceService,
     private readonly assignmentService: StaffServiceAssignmentService,
@@ -61,7 +66,7 @@ export class ServiceOrderService {
    *
    * @returns Mã phiếu dịch vụ mới
    */
-  async generateOrderCode(): Promise<string> {
+  async generateOrderCode(session?: ClientSession): Promise<string> {
     const now = new Date();
     const startOfDay = new Date(now);
     startOfDay.setHours(0, 0, 0, 0);
@@ -69,9 +74,14 @@ export class ServiceOrderService {
     const endOfDay = new Date(startOfDay);
     endOfDay.setDate(endOfDay.getDate() + 1);
 
-    const count = await this.serviceOrderModel.countDocuments({
+    const query = this.serviceOrderModel.countDocuments({
       created_at: { $gte: startOfDay, $lt: endOfDay },
     });
+    if (session) {
+      query.session(session);
+    }
+
+    const count = await query.exec();
 
     const datePart = [
       now.getFullYear(),
@@ -95,6 +105,7 @@ export class ServiceOrderService {
   async create(
     dto: CreateServiceOrderDto,
     currentUser: AuthenticatedUser,
+    session?: ClientSession,
   ): Promise<ServiceOrderResponseDto> {
     await this.assertCustomerActive(dto.customerId);
 
@@ -114,16 +125,26 @@ export class ServiceOrderService {
       completedAt: null,
       invoicedAt: null,
       cancelledAt: null,
+      cancelledBy: null,
+      cancelReason: null,
     };
 
     for (let attempt = 1; attempt <= ORDER_CODE_RETRY_LIMIT; attempt += 1) {
       try {
-        const orderCode = await this.generateOrderCode();
-        const created = await this.serviceOrderModel.create({
+        const orderCode = await this.generateOrderCode(session);
+        const documentPayload = {
           ...payload,
           orderCode,
-        });
-        return this.findOne(this.getObjectIdString(created._id));
+        };
+        const created = session
+          ? (
+              await this.serviceOrderModel.create([documentPayload], {
+                session,
+              })
+            )[0]
+          : await this.serviceOrderModel.create(documentPayload);
+
+        return this.findOne(this.getObjectIdString(created._id), session);
       } catch (error) {
         if (
           this.isDuplicateKeyError(error) &&
@@ -260,24 +281,54 @@ export class ServiceOrderService {
     orderId: string,
     dto: UpdateServiceOrderDto,
   ): Promise<ServiceOrderResponseDto> {
-    const order = await this.findOrderDocumentOrThrow(orderId);
+    const session = await this.connection.startSession();
+    let result: ServiceOrderResponseDto | undefined;
 
-    if (dto.note !== undefined) {
-      order.note = dto.note.trim();
+    try {
+      await session.withTransaction(async () => {
+        const order = await this.findOrderDocumentOrThrow(orderId, session);
+        const previousStatus = order.status;
+
+        if (dto.note !== undefined) {
+          order.note = dto.note.trim();
+        }
+
+        if (dto.extraCharge !== undefined) {
+          order.extraCharge = dto.extraCharge;
+        }
+
+        if (dto.status !== undefined) {
+          this.applyPatchStatusTransition(order, dto.status);
+        }
+
+        this.recalculateTotals(order);
+        await order.save({ session });
+
+        if (
+          previousStatus === ServiceOrderStatus.DRAFT &&
+          order.status === ServiceOrderStatus.IN_PROGRESS
+        ) {
+          await this.syncBookingStatus(
+            order.bookingId,
+            BookingStatus.IN_PROGRESS,
+            session,
+          );
+        }
+
+        result = await this.findOne(orderId, session);
+      });
+    } finally {
+      await session.endSession();
     }
 
-    if (dto.extraCharge !== undefined) {
-      order.extraCharge = dto.extraCharge;
+    if (!result) {
+      throw new ConflictException({
+        code: ERROR_CODES.VALIDATION_FAILED,
+        message: 'Không thể cập nhật phiếu dịch vụ, vui lòng thử lại',
+      });
     }
 
-    if (dto.status !== undefined) {
-      this.applyPatchStatusTransition(order, dto.status);
-    }
-
-    this.recalculateTotals(order);
-    await order.save();
-
-    return this.findOne(orderId);
+    return result;
   }
 
   /**
@@ -289,17 +340,40 @@ export class ServiceOrderService {
    * @throws NotFoundException - Phiếu không tồn tại
    */
   async complete(orderId: string): Promise<ServiceOrderResponseDto> {
-    const order = await this.findOrderDocumentOrThrow(orderId);
+    const session = await this.connection.startSession();
+    let result: ServiceOrderResponseDto | undefined;
 
-    if (order.status !== ServiceOrderStatus.IN_PROGRESS) {
-      throw this.invalidStatusException();
+    try {
+      await session.withTransaction(async () => {
+        const order = await this.findOrderDocumentOrThrow(orderId, session);
+
+        if (order.status !== ServiceOrderStatus.IN_PROGRESS) {
+          throw this.invalidStatusException();
+        }
+
+        order.status = ServiceOrderStatus.COMPLETED;
+        order.completedAt = new Date();
+        await order.save({ session });
+        await this.syncBookingStatus(
+          order.bookingId,
+          BookingStatus.COMPLETED,
+          session,
+        );
+
+        result = await this.findOne(orderId, session);
+      });
+    } finally {
+      await session.endSession();
     }
 
-    order.status = ServiceOrderStatus.COMPLETED;
-    order.completedAt = new Date();
-    await order.save();
+    if (!result) {
+      throw new ConflictException({
+        code: ERROR_CODES.VALIDATION_FAILED,
+        message: 'Không thể hoàn tất phiếu dịch vụ, vui lòng thử lại',
+      });
+    }
 
-    return this.findOne(orderId);
+    return result;
   }
 
   /**
@@ -331,6 +405,7 @@ export class ServiceOrderService {
     const trimmedReason = reason.trim();
     order.status = ServiceOrderStatus.CANCELLED;
     order.cancelledAt = new Date();
+    order.cancelReason = trimmedReason;
     order.note = order.note
       ? `${order.note}\nHủy phiếu: ${trimmedReason}`
       : `Hủy phiếu: ${trimmedReason}`;
@@ -585,6 +660,21 @@ export class ServiceOrderService {
     order.startedAt = new Date();
   }
 
+  private async syncBookingStatus(
+    bookingId: Types.ObjectId | null,
+    status: BookingStatus.IN_PROGRESS | BookingStatus.COMPLETED,
+    session: ClientSession,
+  ): Promise<void> {
+    if (!bookingId) {
+      return;
+    }
+
+    await this.bookingModel
+      .updateOne({ _id: bookingId }, { $set: { status } })
+      .session(session)
+      .exec();
+  }
+
   private recalculateTotals(order: ServiceOrderDocument): void {
     order.itemsSubtotal = order.items.reduce(
       (sum, item) => sum + item.subtotal,
@@ -647,6 +737,10 @@ export class ServiceOrderService {
       completedAt: doc.completedAt?.toISOString() ?? null,
       invoicedAt: doc.invoicedAt?.toISOString() ?? null,
       cancelledAt: doc.cancelledAt?.toISOString() ?? null,
+      cancelledBy: doc.cancelledBy
+        ? this.getObjectIdString(doc.cancelledBy)
+        : null,
+      cancelReason: doc.cancelReason ?? null,
       createdAt: doc.created_at?.toISOString() ?? '',
       updatedAt: doc.updated_at?.toISOString() ?? '',
     };
