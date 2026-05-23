@@ -14,6 +14,7 @@ import { ServiceMaterialBomModule } from './modules/service-material-bom/service
 import { SupplierModule } from './modules/supplier/supplier.module';
 import { StaffServiceAssignmentModule } from './modules/staff-service-assignment/staff-service-assignment.module';
 import { CustomerModule } from './modules/customer/customer.module';
+import { StockLedgerModule } from './modules/stock-ledger/stock-ledger.module';
 
 /**
  * Root module của backend.
@@ -40,6 +41,7 @@ import { CustomerModule } from './modules/customer/customer.module';
     ServiceMaterialBomModule,
     StaffServiceAssignmentModule,
     CustomerModule,
+    StockLedgerModule,
   ],
   providers: [
     {

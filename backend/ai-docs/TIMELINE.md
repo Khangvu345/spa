@@ -9,6 +9,7 @@
 
 | Ngày | # | Dev | Module | Issue | Tóm tắt | Code? | Link |
 |---|---|---|---|---|---|---|---|
+| 2026-05-23 | 001 | Khanh | stock-ledger | [#19](issues/19.md) | Scaffold module stock-ledger: schema + 6 DTO + service (transaction) + controller + helper `deductForInvoice` | ⚠️ | [log](modules/stock-ledger/2026-05-23_001_Khanh.md) |
 | 2026-05-19 | 001 | Khanh | service-material-bom | [#18](issues/18.md) | Scaffold module BOM CRUD + seed 15 entries định mức cho 6 dịch vụ | ⚠️ | [log](modules/service-material-bom/2026-05-19_001_Khanh.md) |
 | 2026-05-21 | 001 | Khang | staff-service-assignment | [#15](issues/15.md) | Triển khai staff_service_assignments schema, endpoints và seed | ⚠️ | [log](modules/staff-service-assignment/2026-05-21_001_Khang.md) |
 | 2026-05-21 | 001 | Khang | customer | [#14](issues/14.md) | Implement Customer CRUD + seed 8 khách hàng | ⚠️ | [log](modules/customer/2026-05-21_001_Khang.md) |

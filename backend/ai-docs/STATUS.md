@@ -12,6 +12,7 @@
 | Khanh | [#06](issues/06.md) | supplier | [log](modules/supplier/2026-05-14_001_Khanh.md) | 🟡 | 2026-05-14 |
 | Khanh | [#07](issues/07.md) | material | [log](modules/material/2026-05-14_002_Khanh.md) | 🟡 | 2026-05-14 |
 | Khanh | [#18](issues/18.md) | service-material-bom | [log](modules/service-material-bom/2026-05-19_001_Khanh.md) | 🟡 | 2026-05-19 |
+| Khanh | [#19](issues/19.md) | stock-ledger | [log](modules/stock-ledger/2026-05-23_001_Khanh.md) | 🟡 | 2026-05-23 |
 | --- | --- | ---| --- | ---| --- |
 | Khang | [#15](issues/15.md) | staff-service-assignment | [log](modules/staff-service-assignment/2026-05-21_001_Khang.md) | 🟡 | 2026-05-21 |
 
