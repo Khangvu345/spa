@@ -105,6 +105,15 @@ export class ServiceOrderResponseDto {
   @ApiPropertyOptional({ description: 'ISO 8601 hoặc null', nullable: true })
   cancelledAt: string | null;
 
+  @ApiPropertyOptional({
+    example: '665f2b8f2b9f2f00123abccc',
+    nullable: true,
+  })
+  cancelledBy: string | null;
+
+  @ApiPropertyOptional({ example: 'Khach huy sau check-in', nullable: true })
+  cancelReason: string | null;
+
   @ApiProperty({ description: 'ISO 8601' })
   createdAt: string;
 
