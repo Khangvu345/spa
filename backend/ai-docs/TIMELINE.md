@@ -9,6 +9,7 @@
 
 | Ngày | # | Dev | Module | Issue | Tóm tắt | Code? | Link |
 |---|---|---|---|---|---|---|---|
+| 2026-05-29 | 001 | Khanh | payroll | [#21](issues/issue-21-payroll.md) | Scaffold module Payroll: schema + 5 DTO + service (aggregate commission + finalize/batch/preview + status flow) + controller (8 endpoints) + wire app.module | ⚠️ | [log](modules/payroll/2026-05-29_001_Khanh.md) |
 | 2026-05-23 | 001 | Khanh | invoice | [#20](issues/20.md) | Scaffold module Invoice + Auto Stock Deduction (CASH): schema + 6 DTO + service (transaction wrap markPaid) + controller + wire app.module | ⚠️ | [log](modules/invoice/2026-05-23_001_Khanh.md) |
 | 2026-05-23 | 001 | Khanh | stock-ledger | [#19](issues/19.md) | Scaffold module stock-ledger: schema + 6 DTO + service (transaction) + controller + helper `deductForInvoice` | ⚠️ | [log](modules/stock-ledger/2026-05-23_001_Khanh.md) |
 | 2026-05-21 | 001 | Khang | service-order | [#16](issues/16.md) | Triển khai Service Order CRUD, status flow, snapshot items và smoke test | ⚠️ | [log](modules/service-order/2026-05-21_001_Khang.md) |
