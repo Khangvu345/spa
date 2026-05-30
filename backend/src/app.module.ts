@@ -18,6 +18,7 @@ import { StockLedgerModule } from './modules/stock-ledger/stock-ledger.module';
 import { ServiceOrderModule } from './modules/service-order/service-order.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { BookingModule } from './modules/booking/booking.module';
+import { UploadModule } from './modules/upload/upload.module';
 
 /**
  * Root module của backend.
@@ -48,6 +49,7 @@ import { BookingModule } from './modules/booking/booking.module';
     ServiceOrderModule,
     InvoiceModule,
     BookingModule,
+    UploadModule,
   ],
   providers: [
     {

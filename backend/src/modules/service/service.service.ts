@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { ERROR_CODES } from '../../shared/constants/error-codes';
 import {
   DEFAULT_LIMIT,
@@ -51,6 +51,7 @@ export class ServiceService {
       bufferMinutes: dto.bufferMinutes ?? 15,
       slotsRequired: dto.slotsRequired ?? 1,
       description: dto.description ?? '',
+      imageUrl: dto.imageUrl ?? '',
       isActive: dto.isActive ?? true,
     });
 
@@ -145,10 +146,7 @@ export class ServiceService {
    * @throws NotFoundException - Service không tồn tại
    * @throws ConflictException - Mã dịch vụ mới đã được service khác sử dụng
    */
-  async update(
-    id: string,
-    dto: UpdateServiceDto,
-  ): Promise<ServiceResponseDto> {
+  async update(id: string, dto: UpdateServiceDto): Promise<ServiceResponseDto> {
     const doc = await this.serviceModel.findById(id);
     if (!doc) {
       throw new NotFoundException({
@@ -178,7 +176,7 @@ export class ServiceService {
 
   private mapToResponse(doc: ServiceDocument): ServiceResponseDto {
     return {
-      id: (doc._id as Types.ObjectId).toString(),
+      id: doc._id.toString(),
       code: doc.code,
       name: doc.name,
       category: doc.category,
@@ -187,7 +185,7 @@ export class ServiceService {
       bufferMinutes: doc.bufferMinutes,
       slotsRequired: doc.slotsRequired,
       description: doc.description ?? '',
-      // imageUrl: doc.imageUrl ?? null,
+      imageUrl: doc.imageUrl ?? '',
       isActive: doc.isActive,
       createdAt: doc.created_at?.toISOString() ?? '',
       updatedAt: doc.updated_at?.toISOString() ?? '',
