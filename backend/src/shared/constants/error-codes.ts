@@ -99,6 +99,16 @@ export const ERROR_CODES = {
   UPLOAD_FAILED: 'UPLOAD_FAILED',
 
   // ──────────────────────────────────────
+  // OTP
+  // ──────────────────────────────────────
+  OTP_NOT_FOUND: 'OTP_NOT_FOUND',
+  OTP_EXPIRED: 'OTP_EXPIRED',
+  OTP_INVALID: 'OTP_INVALID',
+  OTP_MAX_ATTEMPTS_EXCEEDED: 'OTP_MAX_ATTEMPTS_EXCEEDED',
+  OTP_RESEND_TOO_SOON: 'OTP_RESEND_TOO_SOON',
+  OTP_SEND_FAILED: 'OTP_SEND_FAILED',
+
+  // ──────────────────────────────────────
   // Invoice + Payment
   // ──────────────────────────────────────
   INVOICE_NOT_FOUND: 'INVOICE_NOT_FOUND',

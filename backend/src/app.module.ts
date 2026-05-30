@@ -19,6 +19,7 @@ import { ServiceOrderModule } from './modules/service-order/service-order.module
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { BookingModule } from './modules/booking/booking.module';
 import { UploadModule } from './modules/upload/upload.module';
+import { OtpModule } from './modules/otp/otp.module';
 
 /**
  * Root module của backend.
@@ -50,6 +51,7 @@ import { UploadModule } from './modules/upload/upload.module';
     InvoiceModule,
     BookingModule,
     UploadModule,
+    OtpModule,
   ],
   providers: [
     {
