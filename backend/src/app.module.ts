@@ -19,6 +19,7 @@ import { ServiceOrderModule } from './modules/service-order/service-order.module
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { BookingModule } from './modules/booking/booking.module';
 import { PayrollModule } from './modules/payroll/payroll.module';
+import { ReportsModule } from './modules/reports/reports.module';
 
 /**
  * Root module của backend.
@@ -50,6 +51,7 @@ import { PayrollModule } from './modules/payroll/payroll.module';
     InvoiceModule,
     BookingModule,
     PayrollModule,
+    ReportsModule,
   ],
   providers: [
     {
