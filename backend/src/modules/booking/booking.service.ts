@@ -28,13 +28,13 @@ import {
   BookingStatus,
 } from './booking.schema';
 import { CancelBookingDto } from './dto/cancel-booking.dto';
-import { CheckInBookingResponseDto, BookingResponseDto } from './dto/booking-response.dto';
+import {
+  CheckInBookingResponseDto,
+  BookingResponseDto,
+} from './dto/booking-response.dto';
 import { CreateBookingOperatorDto } from './dto/create-booking-operator.dto';
 import { CreateBookingPublicDto } from './dto/create-booking-public.dto';
-import {
-  BookingSortField,
-  QueryBookingDto,
-} from './dto/query-booking.dto';
+import { BookingSortField, QueryBookingDto } from './dto/query-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { SlotAvailabilityService } from './slot-availability.service';
 
@@ -62,11 +62,12 @@ const CANCELLABLE_STATUSES = [
   BookingStatus.CHECKED_IN,
   BookingStatus.IN_PROGRESS,
 ];
-const PATCH_STATUS_TRANSITIONS: Partial<Record<BookingStatus, BookingStatus[]>> =
-  {
-    [BookingStatus.CHECKED_IN]: [BookingStatus.IN_PROGRESS],
-    [BookingStatus.IN_PROGRESS]: [BookingStatus.COMPLETED],
-  };
+const PATCH_STATUS_TRANSITIONS: Partial<
+  Record<BookingStatus, BookingStatus[]>
+> = {
+  [BookingStatus.CHECKED_IN]: [BookingStatus.IN_PROGRESS],
+  [BookingStatus.IN_PROGRESS]: [BookingStatus.COMPLETED],
+};
 
 @Injectable()
 export class BookingService {
@@ -116,9 +117,7 @@ export class BookingService {
   /**
    * Create a public landing-page booking and auto-create/reuse the customer by phone.
    */
-  async createPublic(
-    dto: CreateBookingPublicDto,
-  ): Promise<BookingResponseDto> {
+  async createPublic(dto: CreateBookingPublicDto): Promise<BookingResponseDto> {
     const scheduledStart = this.parseDateTime(dto.scheduledStart);
     const customer = await this.customerService.findOrCreateByPhone({
       fullName: dto.fullName,
@@ -135,6 +134,33 @@ export class BookingService {
       note: dto.note,
       createdBy: null,
     });
+  }
+
+  /**
+   * Create a public landing-page booking that waits for OTP confirmation.
+   */
+  async createPublicPendingOtp(
+    dto: CreateBookingPublicDto,
+  ): Promise<BookingResponseDto> {
+    const scheduledStart = this.parseDateTime(dto.scheduledStart);
+    const customer = await this.customerService.findOrCreateByPhone({
+      fullName: dto.fullName,
+      phone: dto.phone,
+      email: dto.email,
+    });
+    const prepared = await this.prepareBooking(dto.serviceId, scheduledStart);
+
+    return this.createBooking(
+      {
+        customer,
+        ...prepared,
+        scheduledStart,
+        source: BookingSource.LANDING_PAGE,
+        note: dto.note,
+        createdBy: null,
+      },
+      BookingStatus.PENDING_OTP,
+    );
   }
 
   /**
@@ -433,6 +459,13 @@ export class BookingService {
   private async createConfirmedBooking(
     payload: BookingCreatePayload,
   ): Promise<BookingResponseDto> {
+    return this.createBooking(payload, BookingStatus.CONFIRMED);
+  }
+
+  private async createBooking(
+    payload: BookingCreatePayload,
+    status: BookingStatus,
+  ): Promise<BookingResponseDto> {
     const scheduledEnd = this.addMinutes(
       payload.scheduledStart,
       payload.service.durationMinutes + payload.service.bufferMinutes,
@@ -464,7 +497,7 @@ export class BookingService {
           },
           scheduledStart: payload.scheduledStart,
           scheduledEnd,
-          status: BookingStatus.CONFIRMED,
+          status,
           source: payload.source,
           otpCode: null,
           otpExpiresAt: null,
@@ -482,7 +515,10 @@ export class BookingService {
 
         return this.findOne(this.getObjectIdString(created._id));
       } catch (error) {
-        if (this.isDuplicateKeyError(error) && attempt < BOOKING_CODE_RETRY_LIMIT) {
+        if (
+          this.isDuplicateKeyError(error) &&
+          attempt < BOOKING_CODE_RETRY_LIMIT
+        ) {
           continue;
         }
 
