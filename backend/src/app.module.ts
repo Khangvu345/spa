@@ -18,6 +18,7 @@ import { StockLedgerModule } from './modules/stock-ledger/stock-ledger.module';
 import { ServiceOrderModule } from './modules/service-order/service-order.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { BookingModule } from './modules/booking/booking.module';
+import { PayrollModule } from './modules/payroll/payroll.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { OtpModule } from './modules/otp/otp.module';
 
@@ -50,6 +51,7 @@ import { OtpModule } from './modules/otp/otp.module';
     ServiceOrderModule,
     InvoiceModule,
     BookingModule,
+    PayrollModule,
     UploadModule,
     OtpModule,
   ],
