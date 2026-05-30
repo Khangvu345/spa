@@ -45,8 +45,8 @@ export class Service {
   @Prop({ default: '' })
   description: string;
 
-  // @Prop({ default: null })
-  // imageUrl?: string | null;
+  @Prop({ default: '' })
+  imageUrl: string;
 
   @Prop({ required: true, default: true })
   isActive: boolean;
