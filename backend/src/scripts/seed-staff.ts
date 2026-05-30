@@ -29,14 +29,6 @@ interface SeedStaff {
 
 const SEED_STAFF: SeedStaff[] = [
   {
-    fullName: 'Quản trị Demo',
-    phone: '0901111100',
-    email: 'admin.demo@spa.local',
-    role: StaffRole.ADMIN,
-    baseSalary: 0,
-    startedAt: new Date('2025-01-01'),
-  },
-  {
     fullName: 'Nguyễn Thị Vận Hành',
     phone: '0901111101',
     email: 'operator@spa.local',
