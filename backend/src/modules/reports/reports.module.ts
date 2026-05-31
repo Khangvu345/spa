@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Booking, BookingSchema } from '../booking/booking.schema';
 import { Invoice, InvoiceSchema } from '../invoice/invoice.schema';
 import { Material, MaterialSchema } from '../material/material.schema';
+import { PdfModule } from '../pdf/pdf.module';
 import {
   ServiceOrder,
   ServiceOrderSchema,
@@ -16,6 +17,7 @@ import { ReportsService } from './reports.service';
  */
 @Module({
   imports: [
+    PdfModule,
     MongooseModule.forFeature([
       { name: Invoice.name, schema: InvoiceSchema }, // doanh thu, theo dịch vụ, theo nhân viên
       { name: Booking.name, schema: BookingSchema }, // đếm booking

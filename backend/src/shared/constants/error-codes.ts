@@ -15,6 +15,7 @@ export const ERROR_CODES = {
   NOT_FOUND: 'NOT_FOUND',
   INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
   INVALID_OBJECT_ID: 'INVALID_OBJECT_ID',
+  PDF_GENERATION_FAILED: 'PDF_GENERATION_FAILED',
 
   // ──────────────────────────────────────
   // Customer

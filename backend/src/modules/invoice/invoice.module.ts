@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CustomerModule } from '../customer/customer.module';
+import { PdfModule } from '../pdf/pdf.module';
 import { ServiceMaterialBomModule } from '../service-material-bom/service-material-bom.module';
 import { ServiceOrderModule } from '../service-order/service-order.module';
 import { StockLedgerModule } from '../stock-ledger/stock-ledger.module';
@@ -15,6 +16,7 @@ import { InvoiceService } from './invoice.service';
     ServiceMaterialBomModule,
     StockLedgerModule,
     CustomerModule,
+    PdfModule,
   ],
   controllers: [InvoiceController],
   providers: [InvoiceService],
