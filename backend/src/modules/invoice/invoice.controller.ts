@@ -8,19 +8,23 @@ import {
   Patch,
   Post,
   Query,
+  Res,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiProduces,
   ApiTags,
 } from '@nestjs/swagger';
+import type { Response } from 'express';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { ParseObjectIdPipe } from '../../common/pipes/parse-objectid.pipe';
 import { Roles } from '../auth/decorators/roles.decorator';
 import type { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
 import { StaffRole } from '../employee/employee/staff.schema';
+import { PdfService } from '../pdf/pdf.service';
 import { CancelInvoiceDto } from './dto/cancel-invoice.dto';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { InvoiceResponseDto } from './dto/invoice-response.dto';
@@ -33,7 +37,10 @@ import { InvoiceService } from './invoice.service';
 @ApiBearerAuth('access-token')
 @Controller('invoices')
 export class InvoiceController {
-  constructor(private readonly invoiceService: InvoiceService) {}
+  constructor(
+    private readonly invoiceService: InvoiceService,
+    private readonly pdfService: PdfService,
+  ) {}
 
   @Post()
   @Roles(StaffRole.OPERATOR, StaffRole.ADMIN)
@@ -50,6 +57,27 @@ export class InvoiceController {
   @ApiOperation({ summary: 'Danh sách hóa đơn (filter + pagination + sort)' })
   findAll(@Query() query: QueryInvoiceDto) {
     return this.invoiceService.findAll(query);
+  }
+
+  @Get(':id/export-pdf')
+  @Roles(StaffRole.OPERATOR, StaffRole.ADMIN)
+  @ApiOperation({ summary: 'Xuất hóa đơn ra PDF để in bill' })
+  @ApiProduces('application/pdf')
+  @ApiOkResponse({
+    description: 'File .pdf (binary, KHÔNG wrap ApiResponse envelope)',
+  })
+  async exportPdf(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const invoice = await this.invoiceService.findOne(id);
+    const buffer = await this.pdfService.buildInvoicePdf(invoice);
+    const filename = `invoice-${invoice.invoiceCode}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+    res.setHeader('Content-Length', buffer.length);
+    res.send(buffer);
   }
 
   @Get(':id')

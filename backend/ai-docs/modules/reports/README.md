@@ -37,6 +37,7 @@ Module báo cáo & dashboard (#22) — **thuần đọc + aggregate**: gom doanh
 | GET | `/reports/by-staff` | Thống kê theo nhân viên (số ca + doanh thu + hoa hồng) — RP-05 | ADMIN |
 | GET | `/reports/service-invoices` | Chi tiết hóa đơn của 1 dịch vụ trong kỳ (pagination) — RP-06 | ADMIN |
 | GET | `/reports/revenue/export` | Export báo cáo doanh thu ra Excel (.xlsx) — RP-07 | ADMIN |
+| GET | `/reports/revenue/export-pdf` | Export báo cáo doanh thu ra PDF | ADMIN |
 
 > Tất cả prefix global `/api/v1`. 1 controller (`ReportsController`) dùng path đầy đủ.
 > Query thời gian: `fromDate`/`toDate` (YYYY-MM-DD) → service convert `[from 00:00, to+1 00:00)`.
@@ -68,13 +69,13 @@ Module báo cáo & dashboard (#22) — **thuần đọc + aggregate**: gom doanh
 
 - Dashboard: gọi 1 lần `/dashboard/overview`, nhận object đủ số (revenue/bookings/servicesCompleted/lowStockCount/topServices) → vẽ card + chart.
 - Báo cáo: chọn date range → `/reports/revenue` (bảng + chart). Click 1 dịch vụ → `/reports/service-invoices` (chi tiết hóa đơn, RP-06).
-- Export: nút "Xuất Excel" → `/reports/revenue/export` với `responseType: 'blob'` → tạo link download. KHÔNG parse JSON.
+- Export: nút "Xuất Excel" → `/reports/revenue/export` với `responseType: 'blob'` → tạo link download. Nút "Xuất PDF" → `/reports/revenue/export-pdf` dạng blob/attachment. KHÔNG parse JSON.
 
 ### Pending
 
 - [ ] Acceptance test (dashboard / revenue / by-service / by-staff / service-invoices / export / authorization) — repo chưa có hạ tầng test (`.spec.ts` = 0). Verify thủ công qua Swagger + seed.
 - [ ] Cross-check `/reports/by-staff` totalCommission == Payroll #21 cùng kỳ.
-- [ ] Export PDF (phase 2B, chỉ nếu dư thời gian).
+- [x] Export PDF báo cáo doanh thu — hoàn thành qua Issue #39.
 
 ---
 
@@ -82,4 +83,5 @@ Module báo cáo & dashboard (#22) — **thuần đọc + aggregate**: gom doanh
 
 | File | Ngày | Dev | Tóm tắt |
 |---|---|---|---|
+| [../pdf/2026-05-30_001_Khang](../pdf/2026-05-30_001_Khang.md) | 2026-05-30 | Khang | Bổ sung export PDF cho báo cáo doanh thu qua `PdfModule` |
 | [2026-05-30_001_Khanh](2026-05-30_001_Khanh.md) | 2026-05-30 | Khanh | Scaffold module Reports & Dashboard: 3 query DTO + response DTO + service (6 aggregate + export Excel) + controller (6 endpoints) + wire app.module; cài exceljs |

@@ -9,6 +9,7 @@ import {
 import type { Response } from 'express';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { StaffRole } from '../employee/employee/staff.schema';
+import { PdfService } from '../pdf/pdf.service';
 import {
   DashboardOverviewDto,
   RevenueReportDto,
@@ -28,7 +29,10 @@ import { ReportsService } from './reports.service';
 @ApiBearerAuth('access-token')
 @Controller()
 export class ReportsController {
-  constructor(private readonly reportsService: ReportsService) {}
+  constructor(
+    private readonly reportsService: ReportsService,
+    private readonly pdfService: PdfService,
+  ) {}
 
   @Get('dashboard/overview')
   @Roles(StaffRole.ADMIN)
@@ -99,6 +103,29 @@ export class ReportsController {
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     );
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Length', buffer.length);
+    res.send(buffer);
+  }
+
+  @Get('reports/revenue/export-pdf')
+  @Roles(StaffRole.ADMIN)
+  @ApiOperation({
+    summary: 'Export báo cáo doanh thu ra PDF — RP-07B',
+  })
+  @ApiProduces('application/pdf')
+  @ApiOkResponse({
+    description: 'File .pdf (binary, KHÔNG wrap ApiResponse envelope)',
+  })
+  async exportRevenuePdf(
+    @Query() query: RevenueReportQueryDto,
+    @Res() res: Response,
+  ): Promise<void> {
+    const report = await this.reportsService.getRevenueReport(query);
+    const buffer = await this.pdfService.buildRevenuePdf(report);
+    const filename = `bao-cao-doanh-thu-${query.fromDate}-${query.toDate}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-Length', buffer.length);
     res.send(buffer);

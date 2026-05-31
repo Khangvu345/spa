@@ -9,6 +9,7 @@
 
 | Ngày | # | Dev | Module | Issue | Tóm tắt | Code? | Link |
 |---|---|---|---|---|---|---|---|
+| 2026-05-30 | 001 | Khang | pdf | [#39](issues/39.md) | Triển khai PdfModule/PdfService bằng pdfmake, gắn export PDF cho báo cáo doanh thu, hóa đơn và phiếu lương | ⚠️ | [log](modules/pdf/2026-05-30_001_Khang.md) |
 | 2026-05-30 | 001 | Khanh | reports | [#22](issues/issue-22-reports-dashboard.md) | Scaffold module Reports & Dashboard: 3 query DTO + response DTO + service (6 aggregate + export Excel) + controller (6 endpoints) + wire app.module; cài exceljs | ⚠️ | [log](modules/reports/2026-05-30_001_Khanh.md) |
 | 2026-05-29 | 001 | Khanh | payroll | [#21](issues/issue-21-payroll.md) | Scaffold module Payroll: schema + 5 DTO + service (aggregate commission + finalize/batch/preview + status flow) + controller (8 endpoints) + wire app.module | ⚠️ | [log](modules/payroll/2026-05-29_001_Khanh.md) |
 | 2026-05-23 | 001 | Khanh | invoice | [#20](issues/20.md) | Scaffold module Invoice + Auto Stock Deduction (CASH): schema + 6 DTO + service (transaction wrap markPaid) + controller + wire app.module | ⚠️ | [log](modules/invoice/2026-05-23_001_Khanh.md) |

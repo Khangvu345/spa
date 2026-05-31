@@ -173,7 +173,7 @@ export class InvoiceService {
       status: InvoiceStatus.DRAFT,
       paymentMethod: null,
       createdBy: new Types.ObjectId(currentUser.id),
-      createdByName: currentUser.email,
+      createdByName: this.resolveUserDisplayName(currentUser),
       note: dto.note?.trim() ?? '',
       stockDeducted: false,
     };
@@ -318,7 +318,7 @@ export class InvoiceService {
         invoice.paymentMethod = paymentMethod;
         invoice.paidAt = new Date();
         invoice.paidBy = new Types.ObjectId(currentUser.id);
-        invoice.paidByName = currentUser.email;
+        invoice.paidByName = this.resolveUserDisplayName(currentUser);
         invoice.stockDeducted = true;
         await invoice.save({ session });
       });
@@ -571,5 +571,9 @@ export class InvoiceService {
     const keyPattern = (error as { keyPattern?: Record<string, unknown> })
       .keyPattern;
     return Boolean(keyPattern && 'invoiceCode' in keyPattern);
+  }
+
+  private resolveUserDisplayName(currentUser: AuthenticatedUser): string {
+    return currentUser.fullName?.trim() || currentUser.email;
   }
 }

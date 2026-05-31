@@ -470,7 +470,7 @@ export class PayrollService {
       invoiceCount: aggregate.invoiceCount,
       status: PayrollStatus.FINALIZED,
       finalizedBy: new Types.ObjectId(currentUser.id),
-      finalizedByName: currentUser.email,
+      finalizedByName: this.resolveUserDisplayName(currentUser),
       finalizedAt: new Date(),
       note,
     };
@@ -655,5 +655,9 @@ export class PayrollService {
     const keyPattern = (error as { keyPattern?: Record<string, unknown> })
       .keyPattern;
     return Boolean(keyPattern && 'payrollCode' in keyPattern);
+  }
+
+  private resolveUserDisplayName(currentUser: AuthenticatedUser): string {
+    return currentUser.fullName?.trim() || currentUser.email;
   }
 }

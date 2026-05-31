@@ -7,19 +7,23 @@ import {
   Param,
   Post,
   Query,
+  Res,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiProduces,
   ApiTags,
 } from '@nestjs/swagger';
+import type { Response } from 'express';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { ParseObjectIdPipe } from '../../common/pipes/parse-objectid.pipe';
 import { Roles } from '../auth/decorators/roles.decorator';
 import type { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
 import { StaffRole } from '../employee/employee/staff.schema';
+import { PdfService } from '../pdf/pdf.service';
 import { CancelPayrollDto } from './dto/cancel-payroll.dto';
 import { FinalizeBatchDto } from './dto/finalize-batch.dto';
 import { FinalizePayrollDto } from './dto/finalize-payroll.dto';
@@ -36,7 +40,10 @@ import { PayrollService } from './payroll.service';
 @ApiBearerAuth('access-token')
 @Controller('payrolls')
 export class PayrollController {
-  constructor(private readonly payrollService: PayrollService) {}
+  constructor(
+    private readonly payrollService: PayrollService,
+    private readonly pdfService: PdfService,
+  ) {}
 
   @Post('finalize')
   @Roles(StaffRole.ADMIN)
@@ -86,6 +93,30 @@ export class PayrollController {
   @ApiOkResponse({ type: PayrollPreviewDto })
   preview(@Query() query: PreviewPayrollDto) {
     return this.payrollService.preview(query);
+  }
+
+  @Get(':id/export-pdf')
+  @ApiOperation({
+    summary:
+      'Xuất phiếu lương ra PDF — ADMIN xem mọi phiếu, STAFF chỉ phiếu của mình',
+  })
+  @ApiProduces('application/pdf')
+  @ApiOkResponse({
+    description: 'File .pdf (binary, KHÔNG wrap ApiResponse envelope)',
+  })
+  async exportPdf(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Res() res: Response,
+  ): Promise<void> {
+    const payroll = await this.payrollService.findOne(id, user);
+    const buffer = await this.pdfService.buildPayrollPdf(payroll);
+    const filename = `payroll-${payroll.payrollCode}.pdf`;
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+    res.setHeader('Content-Length', buffer.length);
+    res.send(buffer);
   }
 
   @Get(':id')

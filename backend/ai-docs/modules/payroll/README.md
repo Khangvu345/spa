@@ -37,6 +37,7 @@ Module phiếu lương (Payroll) — chốt lương hàng tháng cho từng nhâ
 | GET | `/payrolls/me` | Phiếu lương của chính mình | JWT (mọi role) |
 | GET | `/payrolls/preview` | Xem trước (tính live, KHÔNG lưu) cho 1 staff + tháng | ADMIN |
 | GET | `/payrolls/:id` | Chi tiết — ADMIN xem mọi phiếu, STAFF chỉ phiếu của mình | JWT + ownership |
+| GET | `/payrolls/:id/export-pdf` | Xuất phiếu lương PDF | JWT + ownership |
 | POST | `/payrolls/:id/mark-paid` | Đánh dấu đã chi: FINALIZED → PAID | ADMIN |
 | POST | `/payrolls/:id/cancel` | Hủy phiếu (chỉ khi chưa PAID) | ADMIN |
 
@@ -78,7 +79,7 @@ Module phiếu lương (Payroll) — chốt lương hàng tháng cho từng nhâ
 ### Pending
 
 - [ ] Acceptance test (aggregate / finalize / batch / status flow / authorization) — repo hiện chưa có hạ tầng unit test (`.spec.ts` = 0). Verify thủ công qua Swagger / seed.
-- [ ] Export Excel/PDF phiếu lương — issue Dashboard/Report (phase 2A)
+- [x] Export PDF phiếu lương — hoàn thành qua Issue #39 (`/payrolls/:id/export-pdf`)
 - [ ] Cron tự động chốt lương cuối tháng (hiện ADMIN bấm thủ công)
 
 ---
@@ -87,4 +88,5 @@ Module phiếu lương (Payroll) — chốt lương hàng tháng cho từng nhâ
 
 | File | Ngày | Dev | Tóm tắt |
 |---|---|---|---|
+| [../pdf/2026-05-30_001_Khang](../pdf/2026-05-30_001_Khang.md) | 2026-05-30 | Khang | Bổ sung export PDF phiếu lương qua `PdfModule` |
 | [2026-05-29_001_Khanh](2026-05-29_001_Khanh.md) | 2026-05-29 | Khanh | Scaffold module Payroll: schema + 5 DTO + service (aggregate commission + finalize/batch/preview + status flow) + controller (8 endpoints) + wire app.module |

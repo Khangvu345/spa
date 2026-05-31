@@ -34,6 +34,7 @@ Module hóa đơn (Invoice) — tạo từ Service Order COMPLETED, thanh toán 
 | POST | `/invoices` | Tạo invoice từ Service Order COMPLETED | OPERATOR, ADMIN |
 | GET | `/invoices` | Danh sách (filter + pagination + sort) | JWT |
 | GET | `/invoices/:id` | Chi tiết | JWT |
+| GET | `/invoices/:id/export-pdf` | Xuất hóa đơn PDF để xem/in bill | OPERATOR, ADMIN |
 | PATCH | `/invoices/:id` | Cập nhật discount/note (chỉ DRAFT) | OPERATOR, ADMIN |
 | POST | `/invoices/:id/finalize` | DRAFT → PENDING_PAYMENT | OPERATOR, ADMIN |
 | POST | `/invoices/:id/mark-paid` | PENDING_PAYMENT → PAID + auto deduct | OPERATOR, ADMIN |
@@ -64,7 +65,7 @@ Module hóa đơn (Invoice) — tạo từ Service Order COMPLETED, thanh toán 
 ### Pending
 
 - [ ] VNPay integration (phase 4 optional)
-- [ ] In PDF hóa đơn (phase 2B)
+- [x] In PDF hóa đơn — hoàn thành qua Issue #39 (`/invoices/:id/export-pdf`)
 - [ ] Refund flow (out of scope hiện tại)
 - [ ] Trigger Salary calculation từ `commissionAmount` snapshot (phase 2)
 - [ ] Acceptance test transaction integrity cần MongoDB replica set local
@@ -75,4 +76,5 @@ Module hóa đơn (Invoice) — tạo từ Service Order COMPLETED, thanh toán 
 
 | File | Ngày | Dev | Tóm tắt |
 |---|---|---|---|
+| [../pdf/2026-05-30_001_Khang](../pdf/2026-05-30_001_Khang.md) | 2026-05-30 | Khang | Bổ sung export PDF hóa đơn qua `PdfModule` |
 | [2026-05-23_001_Khanh](2026-05-23_001_Khanh.md) | 2026-05-23 | Khanh | Scaffold module Invoice: schema + 6 DTO + service (transaction + auto stock deduct) + controller + wire app.module |
