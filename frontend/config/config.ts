@@ -26,7 +26,7 @@ export default defineConfig({
 		// baseSeparator: '_',
 	},
 	dynamicImport: {
-		loading: '@ant-design/pro-layout/es/PageLoading',
+		loading: '@/components/Loading',
 	},
 	targets: {
 		ie: 11,
@@ -49,6 +49,7 @@ export default defineConfig({
 	// Fast Refresh 热更新
 	fastRefresh: {},
 
+	extraPostCSSPlugins: [require('@tailwindcss/postcss7-compat'), require('autoprefixer')],
 	nodeModulesTransform: {
 		type: 'none',
 	},

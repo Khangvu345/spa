@@ -1,0 +1,21 @@
+# Netlify config cho FE umi 3.5 (SPA). Đặt ở thư mục gốc của frontend.
+# Dùng chung cho cả 2 site (landing + quản lý) vì là 1 build.
+
+[build]
+  command = "umi build"
+  publish = "dist"
+  # Nếu repo Git có frontend là thư mục con, mở dòng dưới và sửa cho đúng:
+  # base = "frontend"
+
+[build.environment]
+  # umi 3.5 build ổn định trên Node 16 (Node 18+ dễ lỗi OpenSSL3).
+  NODE_VERSION = "16"
+  # APP_CONFIG_API_URL: nên set ở UI mỗi site (Site settings → Environment variables)
+  # để mỗi site trỏ BE riêng nếu cần. Nếu cố định chung, bỏ comment dòng dưới:
+  # APP_CONFIG_API_URL = "https://api.lunaspa.vn/api/v1"
+
+# SPA fallback — route động :id + browser history cần rewrite về index.html.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
