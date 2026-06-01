@@ -1,5 +1,5 @@
 import { Card } from 'antd';
-import '../../TrangChu/components/style.less';
+import '../../admin/Dashboard/components/style.less';
 import { unitName } from '@/services/base/constant';
 
 const AboutPage = () => {

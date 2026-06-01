@@ -3,6 +3,24 @@ import { message, notification } from 'antd';
 import axios from 'axios';
 // import { history } from 'umi';
 import data from './data';
+import { AUTH_TOKEN_KEY } from '@/services/Auth/constant';
+
+// Đính Bearer token vào mọi request nếu có (SPA backend dùng JWT).
+axios.interceptors.request.use(
+	(config) => {
+		if (!config.headers?.Authorization) {
+			const token = localStorage.getItem(AUTH_TOKEN_KEY);
+			if (token) {
+				config.headers = {
+					...(config.headers ?? {}),
+					Authorization: `Bearer ${token}`,
+				} as any;
+			}
+		}
+		return config;
+	},
+	(error) => Promise.reject(error),
+);
 
 // function routeLogin(errorCode: string) {
 //   // notification.warning({
@@ -83,12 +101,34 @@ axios.interceptors.response.use(
 
 				case 401:
 					// Nếu có access token (có thể access token hết hạn) thì mới cảnh báo
-					if (originalRequest?.headers?.Authorization)
+					if (originalRequest?.headers?.Authorization) {
 						notification.error({
-							message: 'Phiên đăng nhập đã thay đổi (104)',
-							description: 'Vui lòng tải lại trang (F5) để cập nhật. Chú ý các dữ liệu chưa lưu sẽ bị mất!',
+							message: 'Phiên đăng nhập đã hết hạn',
+							description: 'Vui lòng đăng nhập lại để tiếp tục.',
 						});
+						try {
+							localStorage.removeItem(AUTH_TOKEN_KEY);
+							localStorage.removeItem('spa_current_user');
+						} catch {}
+						if (window.location.pathname !== '/login') {
+							window.location.replace('/login');
+						}
+					}
 					if (originalRequest._retry) break;
+					break;
+
+				case 403:
+					// MUST_CHANGE_PASSWORD → ép user về trang đổi mật khẩu.
+					if (er?.code === 'MUST_CHANGE_PASSWORD' || er?.message?.includes('đổi mật khẩu')) {
+						if (window.location.pathname !== '/change-password') {
+							window.location.replace('/change-password');
+						}
+					} else {
+						notification.error({
+							message: 'Không có quyền',
+							description: descriptionError || 'Bạn không có quyền thực hiện thao tác này',
+						});
+					}
 					break;
 				// return routeLogin('Unauthorize');
 

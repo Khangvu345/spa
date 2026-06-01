@@ -1,0 +1,27 @@
+@import '~antd/es/style/themes/default.less';
+
+.spa-dashboard {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	padding: 24px 32px;
+	margin: 0;
+}
+
+@media (max-width: @screen-md) {
+	.spa-dashboard {
+		.kpi-card {
+			padding: 16px;
+
+			.kpi-value {
+				font-size: 20px;
+			}
+		}
+
+		.chart-card,
+		.table-card,
+		.services-card {
+			padding: 16px;
+		}
+	}
+}

@@ -1,0 +1,126 @@
+.login-hero__title {
+  font-size: clamp(36px, 4.5vw, 56px);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.login-form__title {
+  font-size: clamp(28px, 4vw, 40px);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: var(--clay-foreground);
+}
+
+.login-form__input {
+  height: 56px;
+  padding: 0 20px;
+  border-radius: 22px;
+  background: #f5e9e9;
+  border: none;
+  color: var(--clay-foreground);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  box-shadow:
+    inset 5px 5px 10px #e3d4d4,
+    inset -5px -5px 10px #ffffff;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+
+  &:focus {
+    background: #ffffff;
+    box-shadow:
+      inset 3px 3px 6px #efe3e3,
+      inset -3px -3px 6px #ffffff,
+      0 0 0 4px rgba(196, 112, 112, 0.2);
+  }
+
+  &::placeholder {
+    color: var(--clay-muted);
+    font-weight: 400;
+  }
+
+  &--with-icon {
+    padding-right: 52px;
+  }
+}
+
+.login-form__eye {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--clay-muted);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover {
+    background: rgba(196, 112, 112, 0.1);
+    color: var(--clay-accent);
+  }
+}
+
+.login-form__alert {
+  border-radius: 18px !important;
+  font-family: 'DM Sans', sans-serif;
+  backdrop-filter: blur(10px);
+
+  &--error {
+    background: rgba(254, 226, 226, 0.7);
+    box-shadow:
+      inset 3px 3px 6px rgba(248, 113, 113, 0.12),
+      inset -3px -3px 6px rgba(255, 255, 255, 0.85);
+  }
+  &--warning {
+    background: rgba(254, 243, 199, 0.7);
+    box-shadow:
+      inset 3px 3px 6px rgba(217, 119, 6, 0.12),
+      inset -3px -3px 6px rgba(255, 255, 255, 0.85);
+  }
+}
+
+.login-form__submit {
+  height: 60px;
+  border-radius: 24px;
+  font-size: 16px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  background: linear-gradient(135deg, #d98b8b 0%, #c47070 100%);
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow:
+    12px 12px 24px rgba(196, 112, 112, 0.32),
+    -8px -8px 16px rgba(255, 255, 255, 0.5),
+    inset 4px 4px 8px rgba(255, 255, 255, 0.4),
+    inset -4px -4px 8px rgba(0, 0, 0, 0.1);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, #e09a9a 0%, #b85f5f 100%);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.96);
+    box-shadow:
+      inset 8px 8px 16px rgba(196, 112, 112, 0.4),
+      inset -8px -8px 16px rgba(255, 255, 255, 0.5);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
