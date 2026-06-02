@@ -104,7 +104,8 @@
     "tinymce": "^5.10.0",
     "umi": "~3.5.0",
     "umi-serve": "~1.9.10",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "yarn": "^1.22.22"
   },
   "devDependencies": {
     "@commitlint/cli": "^13.1.0",

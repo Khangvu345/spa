@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Set-Location d:/Code/Project/RIPT1307-3-KTHP/backend; npx eslint src/modules/invoice --fix 2>&1 | Select-Object -Last 30; \"exit=$LASTEXITCODE\")",
+      "PowerShell(Set-Location d:/Code/Project/RIPT1307-3-KTHP/backend; npx eslint src/modules/invoice 2>&1 | Select-Object -Last 20; \"exit=$LASTEXITCODE\")"
+    ]
+  }
+}
