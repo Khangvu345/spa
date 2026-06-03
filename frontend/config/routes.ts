@@ -114,6 +114,13 @@ export default [
 		access: 'canAdmin',
 	},
 	{
+		path: '/bang-luong',
+		name: 'Bảng lương',
+		component: './admin/Payroll',
+		icon: 'WalletOutlined',
+		access: 'canAdmin',
+	},
+	{
 		path: '/kho-dashboard',
 		name: 'Kho vật liệu',
 		component: './admin/InventoryDashboard',
