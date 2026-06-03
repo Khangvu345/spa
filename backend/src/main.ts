@@ -1,7 +1,3 @@
-import * as dns from 'dns';
-dns.setDefaultResultOrder('ipv4first');
-dns.setServers(['8.8.8.8', '1.1.1.1']);
-
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -10,12 +6,15 @@ import { getConnectionToken } from '@nestjs/mongoose';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { configureDns } from './config/dns.config';
 
 /**
  * Entry point của ứng dụng NestJS.
  * Bootstrap app + setup Swagger + global pipes/filters/interceptors + listen MongoDB events.
  */
 async function bootstrap() {
+  configureDns();
+
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('Bootstrap');
 

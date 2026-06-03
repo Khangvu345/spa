@@ -2,6 +2,8 @@
 @import '~antd/dist/antd.variable.min.css';
 @import '_variable.less';
 @import 'layout.less';
+@import 'sidebar.less';
+@import 'antd-overrides.less';
 @import 'split-panel.less';
 
 html,
@@ -99,17 +101,14 @@ a {
 	height: 6px;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
 	background: transparent;
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
 	background: #888;
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
 	background: #555;
 }
@@ -196,8 +195,6 @@ canvas {
 .filter-node {
 	color: var(--primary-color);
 }
-
-// style select
 
 .width-select-custom {
 	width: calc(100% - 40px) !important;
@@ -365,7 +362,6 @@ canvas {
 	}
 }
 
-// Card Statistics Small
 .card-stat-small {
 	&.pointer {
 		cursor: pointer;
@@ -468,7 +464,6 @@ canvas {
 	}
 }
 
-// Big calendar
 .ant-card-body,
 .ant-modal-body {
 	.rbc-toolbar {

@@ -9,18 +9,18 @@ const Settings: LayoutSettings & {
 	navTheme: 'light',
 	primaryColor: process.env.APP_CONFIG_PRIMARY_COLOR,
 	borderRadiusBase: '2px',
-	layout: 'mix',
+	layout: 'side',
 	contentWidth: 'Fluid',
 	fixedHeader: false,
 	fixSiderbar: true,
 	colorWeak: false,
-	title: 'LẬP TRÌNH WEB - RIPT',
+	title: 'Luna Spa',
 	pwa: false,
-	logo: '/logo.png',
+	logo: '/spalogo.png',
 	iconfontUrl: '',
 	headerTheme: 'light',
 	headerHeight: 60,
-	siderWidth: 220,
+	siderWidth: 260,
 };
 
 export default Settings;

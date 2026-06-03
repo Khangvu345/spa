@@ -1,4 +1,4 @@
-﻿export default [
+export default [
 	{
 		path: '/user',
 		layout: false,
@@ -16,65 +16,130 @@
 		],
 	},
 
-	///////////////////////////////////
-	// DEFAULT MENU
 	{
-		path: '/dashboard',
-		name: 'Dashboard',
-		component: './TrangChu',
-		icon: 'HomeOutlined',
-	},
-	{
-		path: '/gioi-thieu',
-		name: 'About',
-		component: './TienIch/GioiThieu',
-		hideInMenu: true,
-	},
-	{
-		path: '/random-user',
-		name: 'RandomUser',
-		component: './RandomUser',
-		icon: 'ArrowsAltOutlined',
-	},
-
-	// DANH MUC HE THONG
-	// {
-	// 	name: 'DanhMuc',
-	// 	path: '/danh-muc',
-	// 	icon: 'copy',
-	// 	routes: [
-	// 		{
-	// 			name: 'ChucVu',
-	// 			path: 'chuc-vu',
-	// 			component: './DanhMuc/ChucVu',
-	// 		},
-	// 	],
-	// },
-
-	{
-		path: '/notification',
-		routes: [
-			{
-				path: './subscribe',
-				exact: true,
-				component: './ThongBao/Subscribe',
-			},
-			{
-				path: './check',
-				exact: true,
-				component: './ThongBao/Check',
-			},
-			{
-				path: './',
-				exact: true,
-				component: './ThongBao/NotifOneSignal',
-			},
-		],
+		path: '/',
+		name: 'LandingPage',
+		component: './landingPage',
 		layout: false,
 		hideInMenu: true,
 	},
 	{
-		path: '/',
+		path: '/login',
+		name: 'Login',
+		component: './loginPage',
+		layout: false,
+		hideInMenu: true,
+	},
+	{
+		path: '/change-password',
+		name: 'ChangePassword',
+		component: './auth/ChangePassword',
+		layout: false,
+		hideInMenu: true,
+	},
+	{
+		path: '/ho-so-cua-toi',
+		name: 'Hồ sơ của tôi',
+		component: './MyProfile',
+		hideInMenu: true,
+		access: 'canAny',
+	},
+	{
+		path: '/feedback',
+		name: 'Feedback',
+		component: './landingPage/components/FeedbackPage',
+		layout: false,
+		hideInMenu: true,
+	},
+
+	///////////////////////////////////
+	// SPA MANAGEMENT MENU — phân quyền theo StaffRole (ADMIN / OPERATOR / STAFF)
+	{
+		path: '/admin/dashboard',
+		name: 'Dashboard',
+		component: './admin/Dashboard',
+		icon: 'DashboardOutlined',
+		access: 'canAdmin',
+	},
+	// OPERATOR kiêm Lễ tân + Thu ngân (xem docs/role-decision.md). Đưa lên đầu
+	// vì là tác vụ vận hành hằng ngày tại quầy.
+	{
+		path: '/le-tan',
+		name: 'Lễ tân',
+		component: './staff/LeTan',
+		icon: 'UserSwitchOutlined',
+		access: 'canOperator',
+	},
+	{
+		path: '/thu-ngan',
+		name: 'Thu ngân',
+		component: './staff/ThuNgan',
+		icon: 'DollarOutlined',
+		access: 'canOperator',
+	},
+	{
+		path: '/lich-hen',
+		name: 'Lịch hẹn',
+		component: './admin/Bookings',
+		icon: 'CalendarOutlined',
+		access: 'canAdminOrOperator',
+	},
+	{
+		path: '/phieu-dich-vu',
+		name: 'Phiếu dịch vụ',
+		component: './admin/ServiceOrders',
+		icon: 'FileDoneOutlined',
+		access: 'canAdminOrOperator',
+	},
+	{
+		path: '/dich-vu',
+		name: 'Dịch vụ',
+		component: './admin/Services',
+		icon: 'StarOutlined',
+		access: 'canAdmin',
+	},
+	{
+		path: '/khach-hang',
+		name: 'Khách hàng',
+		component: './admin/Customers',
+		icon: 'TeamOutlined',
+		access: 'canAdminOrOperator',
+	},
+	// ADMIN: top-level "Nhân viên" trỏ thẳng vào Quản lý nhân viên.
+	{
+		path: '/nhan-vien/quan-ly',
+		name: 'Nhân viên',
+		component: './admin/Employees',
+		icon: 'TeamOutlined',
+		access: 'canAdmin',
+	},
+	{
+		path: '/kho-dashboard',
+		name: 'Kho vật liệu',
+		component: './admin/InventoryDashboard',
+		icon: 'AppstoreOutlined',
+		access: 'canAdmin',
+	},
+	{
+		path: '/vat-lieu',
+		name: 'Vật liệu',
+		component: './admin/Materials',
+		icon: 'InboxOutlined',
+		access: 'canAdmin',
+	},
+	{
+		path: '/lich-su-kho',
+		name: 'Lịch sử kho',
+		component: './admin/StockLedger',
+		icon: 'HistoryOutlined',
+		access: 'canAdmin',
+	},
+	{
+		path: '/nha-cung-cap',
+		name: 'Nhà cung cấp',
+		component: './admin/Suppliers',
+		icon: 'ShopOutlined',
+		access: 'canAdmin',
 	},
 	{
 		path: '/403',

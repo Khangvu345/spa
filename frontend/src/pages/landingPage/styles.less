@@ -1,0 +1,98 @@
+// Landing page overrides — đã chuyển sang clay aesthetic.
+// Token nguồn ở src/styles/tailwind.css và antd-overrides.less.
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.landing-input.ant-input,
+.landing-input.ant-input-affix-wrapper,
+textarea.landing-input.ant-input {
+  height: 52px;
+  border-radius: 20px !important;
+  background: #f5e9e9 !important;
+  border: none !important;
+  box-shadow:
+    inset 4px 4px 8px #e3d4d4,
+    inset -4px -4px 8px #ffffff !important;
+  color: var(--clay-foreground) !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 15px;
+  padding: 10px 18px;
+}
+
+textarea.landing-input.ant-input {
+  height: auto;
+}
+
+.landing-input.ant-input:focus,
+textarea.landing-input.ant-input:focus,
+.landing-input.ant-input-focused,
+.landing-input.ant-input-affix-wrapper-focused {
+  background: #ffffff !important;
+  box-shadow:
+    inset 2px 2px 4px #efe3e3,
+    inset -2px -2px 4px #ffffff,
+    0 0 0 4px rgba(196, 112, 112, 0.2) !important;
+}
+
+.landing-select .ant-select-selector {
+  height: 52px !important;
+  border-radius: 20px !important;
+  background: #f5e9e9 !important;
+  border: none !important;
+  box-shadow:
+    inset 4px 4px 8px #e3d4d4,
+    inset -4px -4px 8px #ffffff !important;
+  padding: 10px 18px !important;
+  display: flex;
+  align-items: center;
+  font-family: 'DM Sans', sans-serif !important;
+}
+
+.landing-select.ant-select-focused .ant-select-selector {
+  background: #ffffff !important;
+  box-shadow:
+    inset 2px 2px 4px #efe3e3,
+    inset -2px -2px 4px #ffffff,
+    0 0 0 4px rgba(196, 112, 112, 0.2) !important;
+}
+
+.landing-btn-primary.ant-btn-primary {
+  height: 56px;
+  border-radius: 22px !important;
+  font-size: 16px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 800 !important;
+  background: linear-gradient(135deg, #d98b8b 0%, #c47070 100%) !important;
+  border: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow:
+    12px 12px 24px rgba(196, 112, 112, 0.32),
+    -8px -8px 16px rgba(255, 255, 255, 0.5),
+    inset 4px 4px 8px rgba(255, 255, 255, 0.4),
+    inset -4px -4px 8px rgba(0, 0, 0, 0.08) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover,
+  &:focus {
+    background: linear-gradient(135deg, #e09a9a 0%, #b85f5f 100%) !important;
+    transform: translateY(-3px);
+  }
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.ant-rate-star-full .anticon,
+.ant-rate-star-half .ant-rate-star-first .anticon {
+  color: var(--clay-accent);
+}

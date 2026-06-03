@@ -1,4 +1,4 @@
-**Phiên bản:** v6 (chốt nghiệp vụ kho end-to-end)  
+**Phiên bản:** v7 (sửa các trạng thái staff theo mô tả của user story)  
 ```mermaid
 erDiagram
  
@@ -20,7 +20,11 @@ erDiagram
     string   password_hash "bcrypt"
     string   role          "ADMIN | RECEPTIONIST | CASHIER | STAFF"
     number   base_salary   "lương cứng tháng - VND"
-    boolean  is_active
+    string   work_status    "ACTIVE | ON_LEAVE | RESIGNED, default ACTIVE"
+    string   account_status "ACTIVE | LOCKED | DELETED, default ACTIVE"
+    date     started_at     "ngày bắt đầu làm việc"
+    date     locked_at      "nullable thời điểm khóa"
+    boolean  must_change_password "default false"
     date     created_at
     date     updated_at
   }

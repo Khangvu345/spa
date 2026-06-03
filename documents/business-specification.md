@@ -1,15 +1,15 @@
- > **Phiên bản:** v6 (chốt nghiệp vụ kho end-to-end)  
+ > **Phiên bản:** v7 (chốt nghiệp vụ kho end-to-end + auth & quản lý nhân viên)  
 > **16 collections** (15 chính thức + 1 phác thảo `otp_verifications` future)  
-> **Thay đổi v5 → v6:**
-> - ➕ Thêm `stock_issues` (Phương án C — Hybrid reference)
-> - 🔧 Đặt lại tên `total_amount` cho rõ ngữ nghĩa: `total_purchase_amount` (nhập), `total_cost_amount` (xuất), `total_amount` (doanh thu)
-> - 📝 Chi tiết hóa embed structure inline cho mọi bảng có array
-> - 📚 Thêm mục §2.10 — Nghiệp vụ kho end-to-end
+> **Thay đổi v6 → v7:**
+> - 🔧 Schema `staff` tách 2 status: `work_status` (HR) + `account_status` (Auth)
+> - ➕ Thêm `started_at`, `locked_at`, `must_change_password` cho staff
+> - 🗑️ Bỏ field `is_active` của staff (gây nhầm lẫn 2 khái niệm)
+> - 📚 Thêm mục §2.11 — Quản lý nhân viên & xác thực
 ## 2. Đặc tả nghiệp vụ chi tiết
  
 ### 2.1. Mô hình khách hàng
  
-- Khách **không có account**, định danh duy nhất qua `phone`.
+- Khách **không có account**, định danh duy nhất qua `phone`.  Staff phải login để dùng hệ thống (xem §2.11)
 - Lần đặt đầu: hệ thống auto-create customer record từ form.
 - Lần sau: `findOne({ phone })` trả về record cũ — track lịch sử.
 - Email là optional (dùng cho OTP qua email khi triển khai sau).
@@ -112,6 +112,7 @@ Tất cả các thông tin sau **CRUD được**:
 - `services` (duration, buffer, unit_price)
 - `materials` (low_stock_threshold)
 - `operational_costs`
+- `staff` (employee CRUD — xem §2.11)
 ### 2.7. Thanh toán — VNPay Sandbox + CASH
  
 **Status flow:**
@@ -138,6 +139,7 @@ DRAFT → PAID (CASH - lễ tân thu trực tiếp)
 - Interface `ISmsProvider` → swap sang `ViettelSmsOtpProvider` khi spa có ĐKKD thật.
 - TTL index trên `expires_at` → MongoDB tự xóa OTP hết hạn.
 - Max 3 lần verify sai → khóa.
+- OTP này chỉ dùng cho khách xác nhận booking. Staff login bằng email + password (xem §2.11), không qua OTP.
 ### 2.9. Operational Costs (Tuần 3)
  
 - Quản lý chi phí vận hành tách biệt với BOM:
@@ -271,12 +273,156 @@ Profit_material = total_material_amount (invoice) - total_cost_amount (stock_iss
 3 con số này là 3 thực thể khác nhau. Đặt tên riêng giúp tránh nhầm khi viết báo cáo và query.
  
 ---
- 
+### 2.11. Quản lý nhân viên & xác thực — Auth + Employee Management
+
+> **Mục tiêu:** Quản lý vòng đời nhân viên từ tạo tài khoản → đăng nhập → 
+> đổi mật khẩu → khóa tài khoản → xóa vĩnh viễn. Tách biệt rõ "trạng thái 
+> làm việc" (HR) và "trạng thái tài khoản" (Auth).
+
+#### 2.11.1. Roles & quyền hạn
+
+4 vai trò trong hệ thống, **không có role HR/Thủ kho riêng** — ADMIN gánh tất cả:
+
+| Role | Tên gọi | Trách nhiệm chính |
+|---|---|---|
+| `ADMIN` | Quản lý | Tất cả: thủ kho, dashboard tài chính, CRUD employees, 
+                       cấu hình hệ thống, payroll, mọi quyết định kinh tế |
+| `RECEPTIONIST` | Lễ tân | Tạo booking, check-in khách, quản lý hàng đợi |
+| `CASHIER` | Thu ngân | Tạo invoice, thu tiền (CASH/VNPay), in bill |
+| `STAFF` | Nhân viên | Làm dịch vụ massage, update status booking của mình |
+
+#### 2.11.2. Hai loại trạng thái — quan trọng phải phân biệt
+
+Schema `staff` có 2 field status **độc lập**:
+
+**`work_status` — trạng thái LÀM VIỆC (HR perspective):**
+
+| Giá trị | Ý nghĩa |
+|---|---|
+| `ACTIVE` | Đang làm việc bình thường |
+| `ON_LEAVE` | Tạm nghỉ (nghỉ thai sản, nghỉ ốm dài, đi học) |
+| `RESIGNED` | Đã nghỉ việc |
+
+**`account_status` — trạng thái TÀI KHOẢN (Auth perspective):**
+
+| Giá trị | Ý nghĩa | Login được? |
+|---|---|---|
+| `ACTIVE` | Tài khoản hoạt động bình thường | ✅ |
+| `LOCKED` | Bị khóa (do admin lock) | ❌ |
+| `DELETED` | Đã xóa soft (sau 30 ngày lock) | ❌ |
+
+**Quy tắc quan trọng:**
+- Login chỉ check `account_status === ACTIVE` — KHÔNG quan tâm `work_status`
+- Nhân viên `work_status = ON_LEAVE` (tạm nghỉ) VẪN login được để xem lương, lịch sử
+- Tách 2 status để xử lý case: "nhân viên nghỉ tạm nhưng vẫn cần access app", 
+  "nhân viên còn làm nhưng bị tạm khóa account do nghi ngờ bảo mật"
+
+#### 2.11.3. Login flow
+ User nhập email + password
+↓
+BE: query staff theo email
+↓
+BE: bcrypt.compare(password, password_hash)
+
+Timing attack mitigation: luôn compare kể cả user không tồn tại
+(dùng dummy hash)
+↓
+BE: check account_status === ACTIVE
+LOCKED → fail
+DELETED → fail
+ACTIVE → continue
+↓
+BE: generate JWT với payload { sub, email, role, mustChangePassword }
+↓
+Return { user, accessToken }
+FE đọc mustChangePassword → redirect đổi password nếu true
+**Generic error message:** Tất cả lỗi login (sai email, sai password, locked, 
+deleted) đều trả CÙNG message "Email hoặc mật khẩu không đúng" — chống 
+user enumeration attack.
+
+#### 2.11.4. Đổi mật khẩu — 2 flow
+
+**Flow A — User tự đổi (`POST /auth/change-password`):**
+User: nhập currentPassword + newPassword
+BE: verify currentPassword đúng
+BE: hash newPassword
+BE: update password_hash + must_change_password = false
+**Flow B — Admin reset (`POST /employees/:id/reset-password`):**
+**Force change password mechanism:**
+
+- `MustChangePasswordGuard` apply global (sau JwtAuthGuard, trước RolesGuard)
+- Đọc `req.user.mustChangePassword` từ JWT payload
+- Nếu true → block mọi endpoint trừ `/auth/change-password` và `/auth/me`
+- Endpoint cho phép phải đánh `@SkipPasswordChange()` decorator
+
+#### 2.11.5. Khóa & xóa tài khoản — 30-day rule
+
+**Lock flow:**
+Admin: POST /employees/:id/lock
+BE validate:
+
+staff tồn tại + account_status === ACTIVE (LOCKED/DELETED → 400)
+staffId !== adminUser.id (admin không lock chính mình → 400)
+BE update:
+account_status = LOCKED
+locked_at = NOW
+**Unlock flow (sửa sai):**
+Admin: POST /employees/:id/unlock
+BE validate: account_status === LOCKED
+BE update:
+
+account_status = ACTIVE
+locked_at = null
+
+**Delete flow — 30 ngày rule:**
+Admin: DELETE /employees/:id
+BE validate:
+
+account_status === LOCKED (không cho delete khi ACTIVE → 400)
+now() - locked_at >= ACCOUNT_DELETE_AFTER_LOCK_DAYS (default 30)
+staffId !== adminUser.id
+BE update (soft delete):
+account_status = DELETED
+email = ${original_email}.deleted.${timestamp}
+(giải phóng email cho người mới)
+KHÔNG xóa physical record (giữ ref cho bookings/invoices/payrolls historical)
+**Tại sao không hard delete?**
+
+Staff được reference từ nhiều collections: `bookings.staff_id`, 
+`stock_receipts.created_by`, `payrolls.staff_id`, `services_snapshot.staff_id` 
+trong invoices. Hard delete sẽ làm vỡ historical reports. Soft delete giữ 
+nguyên ref, chỉ disable login + giải phóng email.
+
+#### 2.11.6. Seed admin đầu tiên
+
+Hệ thống cần ít nhất 1 ADMIN để vận hành. Vì POST /employees yêu cầu 
+`@Roles('ADMIN')`, không thể "self-register" admin đầu.
+
+**Giải pháp:** Script seed.
+
+```bash
+npm run seed:admin
+# Đọc credentials từ .env:
+#   SEED_ADMIN_EMAIL, SEED_ADMIN_PASSWORD, 
+#   SEED_ADMIN_FULL_NAME, SEED_ADMIN_PHONE
+# Idempotent: chạy lần 2 thấy đã tồn tại → skip
+```
+
+Default values trong `.env.example`:
+#### 2.11.7. Trade-offs đã chọn cho MVP
+
+| Vấn đề | Lựa chọn MVP | Trade-off |
+|---|---|---|
+| JWT revocation | Stateless, không blacklist | User bị fired vẫn dùng được token tới khi expire (3 ngày). Admin có thể `lock account` để force logout ngay |
+| Refresh token | Không có | User login lại sau 3 ngày |
+| Forgot password | Admin reset thủ công | Không cần email service. Phù hợp scope đồ án nội bộ |
+| Username | Dùng email | 1 field, đơn giản. Industry standard cho internal system |
+| Audit log | Không có | Post-MVP nếu cần (ai reset password ai, ai lock ai) |
 ## 3. Indexes cần tạo
  
 ```
 customers:           phone (unique)
-staff:               email (unique)
+staff:               email (unique), account_status, work_status, (account_status, locked_at) compound
 services:            code (unique)
 materials:           code (unique)
 suppliers:           (không bắt buộc unique)
@@ -385,7 +531,7 @@ commission_configs:  service_id (unique)
 | # | Collection | Mục đích | Ghi chú nghiệp vụ kho |
 |---|---|---|---|
 | 1 | `customers` | Khách (định danh phone) | |
-| 2 | `staff` | Nhân viên + login | `created_by` cho stock_receipts/stock_issues |
+| 2 | `staff` | Nhân viên + auth (work_status + account_status tách riêng) | `created_by` cho stock_receipts/stock_issues |
 | 3 | `services` | Dịch vụ spa + buffer | |
 | 4 | `materials` | **Vật liệu kho** | Tracking `stock_quantity` real-time |
 | 5 | `suppliers` | **Nhà cung cấp** | Reference từ stock_receipts |

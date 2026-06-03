@@ -66,3 +66,9 @@ export const BCRYPT_SALT_ROUNDS = 10;
 
 /** JWT default expiry */
 export const JWT_DEFAULT_EXPIRES_IN = '24h';
+
+/** Mật khẩu mặc định khi admin reset tài khoản nhân viên */
+export const DEFAULT_RESET_PASSWORD = 'ChangeMe@123';
+
+/** Số ngày tài khoản phải bị khóa trước khi được xóa mềm */
+export const ACCOUNT_DELETE_AFTER_LOCK_DAYS = 30;

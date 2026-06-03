@@ -1,0 +1,859 @@
+// Override AntD 4.21 → High-Fidelity Claymorphism aesthetic.
+// Tokens nguồn tại src/styles/tailwind.css (:root --clay-*) và tailwind.config.js.
+// Project antd borderRadiusBase = 2px → bo về clay (20px+).
+
+// ─── Modal mask (overlay phía sau modal) — warm tint thay vì grey
+.ant-modal-mask,
+.ant-image-preview-mask {
+  background: rgba(74, 63, 63, 0.35) !important;
+  backdrop-filter: blur(4px);
+}
+
+.ant-drawer-mask {
+  background: rgba(74, 63, 63, 0.35) !important;
+  backdrop-filter: blur(4px);
+}
+
+.ant-tooltip-inner {
+  background: rgba(74, 63, 63, 0.92) !important;
+  color: #fff !important;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  border-radius: 12px !important;
+  padding: 8px 12px !important;
+  box-shadow: 8px 8px 18px rgba(0, 0, 0, 0.15);
+}
+.ant-tooltip-arrow-content {
+  background: rgba(74, 63, 63, 0.92) !important;
+}
+
+// ─── Override browser autofill (Chrome/Edge): tránh xanh dương lavender
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--clay-foreground) !important;
+  -webkit-box-shadow:
+    0 0 0 1000px #f5e9e9 inset,
+    inset 4px 4px 8px #e3d4d4,
+    inset -4px -4px 8px #ffffff !important;
+  caret-color: var(--clay-foreground) !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+
+.ant-modal {
+  .ant-modal-content {
+    border-radius: 32px !important;
+    overflow: hidden;
+    box-shadow:
+      0 16px 40px rgba(180, 130, 130, 0.2),
+      0 4px 10px rgba(180, 130, 130, 0.08);
+    background: #fff5f5;
+  }
+
+  .ant-modal-header {
+    border-radius: 32px 32px 0 0 !important;
+    border-bottom: 1px solid rgba(196, 112, 112, 0.08);
+    background: transparent;
+    padding: 20px 28px;
+
+    .ant-modal-title {
+      font-family: 'Nunito', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--clay-foreground);
+    }
+  }
+
+  .ant-modal-body {
+    padding: 24px 28px;
+    color: var(--clay-foreground);
+  }
+
+  .ant-modal-footer {
+    border-top: 1px solid rgba(196, 112, 112, 0.08);
+    padding: 16px 28px;
+    background: transparent;
+  }
+
+  .ant-modal-close {
+    top: 14px;
+    right: 16px;
+    .ant-modal-close-x {
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      font-size: 16px;
+      border-radius: 50%;
+      color: var(--clay-muted);
+      transition: background 0.2s ease;
+      &:hover {
+        background: rgba(196, 112, 112, 0.1);
+        color: var(--clay-accent);
+      }
+    }
+  }
+}
+
+.ant-drawer-content {
+  border-top-left-radius: 32px !important;
+  border-bottom-left-radius: 32px !important;
+  overflow: hidden;
+}
+.ant-drawer-header {
+  border-bottom: 1px solid rgba(196, 112, 112, 0.08);
+  background: transparent;
+  padding: 20px 28px;
+  .ant-drawer-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    color: var(--clay-foreground);
+  }
+}
+.ant-drawer-content {
+  background: #fff5f5 !important;
+}
+
+.ant-drawer-body {
+  background: transparent;
+}
+
+.ant-btn {
+  border-radius: 20px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.01em;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: none !important;
+  height: 40px;
+  padding: 0 18px;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.ant-btn-sm {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 16px !important;
+}
+
+.ant-btn-lg {
+  height: 52px;
+  padding: 0 28px;
+  border-radius: 24px !important;
+  font-size: 16px !important;
+}
+
+.ant-btn-primary {
+  background: linear-gradient(135deg, #d98b8b 0%, #c47070 100%) !important;
+  color: #ffffff !important;
+  box-shadow:
+    8px 8px 16px rgba(196, 112, 112, 0.3),
+    -4px -4px 12px rgba(255, 255, 255, 0.6),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.3),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.08);
+
+  &:hover, &:focus {
+    background: linear-gradient(135deg, #e09a9a 0%, #b85f5f 100%) !important;
+    box-shadow:
+      12px 12px 24px rgba(196, 112, 112, 0.38),
+      -6px -6px 16px rgba(255, 255, 255, 0.7),
+      inset 2px 2px 4px rgba(255, 255, 255, 0.4),
+      inset -2px -2px 4px rgba(0, 0, 0, 0.06);
+  }
+
+  &:active {
+    box-shadow:
+      inset 6px 6px 12px rgba(196, 112, 112, 0.4),
+      inset -6px -6px 12px rgba(255, 255, 255, 0.5) !important;
+  }
+}
+
+.ant-btn-default {
+  background: rgba(255, 255, 255, 0.7) !important;
+  color: var(--clay-foreground) !important;
+  box-shadow:
+    6px 6px 14px rgba(180, 150, 150, 0.18),
+    -4px -4px 10px rgba(255, 255, 255, 0.9),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.6),
+    inset -2px -2px 4px rgba(196, 112, 112, 0.04) !important;
+
+  &:hover, &:focus {
+    color: var(--clay-accent) !important;
+    background: #ffffff !important;
+  }
+}
+
+.ant-btn-text {
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--clay-foreground) !important;
+  &:hover {
+    background: rgba(196, 112, 112, 0.08) !important;
+    color: var(--clay-accent) !important;
+  }
+}
+
+.ant-btn-link {
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--clay-accent) !important;
+  &:hover {
+    color: #b85f5f !important;
+    transform: none;
+  }
+}
+
+.ant-btn-dangerous {
+  background: rgba(255, 255, 255, 0.7) !important;
+  color: #c44545 !important;
+  box-shadow:
+    6px 6px 14px rgba(196, 69, 69, 0.18),
+    -4px -4px 10px rgba(255, 255, 255, 0.9),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.6),
+    inset -2px -2px 4px rgba(196, 69, 69, 0.04) !important;
+  &:hover, &:focus {
+    background: #fff5f5 !important;
+    color: #a33333 !important;
+  }
+  &.ant-btn-primary {
+    background: linear-gradient(135deg, #e88a8a 0%, #c44545 100%) !important;
+    color: #ffffff !important;
+  }
+}
+
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-input-number,
+.ant-picker,
+.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  border-radius: 20px !important;
+  background: #f5e9e9 !important;
+  border: none !important;
+  box-shadow:
+    inset 4px 4px 8px #e3d4d4,
+    inset -4px -4px 8px #ffffff !important;
+  color: var(--clay-foreground) !important;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  height: 42px !important;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+}
+
+.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  padding: 0 16px !important;
+
+  .ant-select-selection-search-input {
+    height: 100% !important;
+    line-height: 40px !important;
+  }
+  .ant-select-selection-item,
+  .ant-select-selection-placeholder {
+    line-height: 40px !important;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.ant-picker {
+  padding: 0 16px !important;
+  .ant-picker-input > input {
+    line-height: 40px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}
+.ant-picker-range-separator {
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+}
+
+.ant-input-number {
+  .ant-input-number-input-wrap,
+  .ant-input-number-input {
+    height: 40px !important;
+    line-height: 40px !important;
+    padding: 0 16px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}
+
+.ant-input:not(textarea) {
+  padding: 0 16px !important;
+  line-height: 40px !important;
+}
+
+textarea.ant-input {
+  height: auto !important;
+  min-height: 80px !important;
+  padding: 12px 16px !important;
+  line-height: 1.5 !important;
+  display: block;
+}
+
+.ant-input-affix-wrapper {
+  padding: 0 16px !important;
+  > input.ant-input {
+    height: 40px !important;
+    line-height: 40px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+}
+
+.ant-input,
+.ant-input-number-input,
+.ant-picker-input > input,
+.ant-select-selection-search-input,
+.ant-select-selection-item,
+.ant-select-selection-placeholder {
+  font-family: 'DM Sans', system-ui, sans-serif !important;
+  color: var(--clay-foreground) !important;
+}
+
+.ant-input::placeholder,
+.ant-select-selection-placeholder,
+.ant-picker-input > input::placeholder {
+  color: var(--clay-muted) !important;
+  font-weight: 400 !important;
+}
+
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-affix-wrapper-focused,
+.ant-input-number-focused,
+.ant-picker-focused,
+.ant-select-focused:not(.ant-select-disabled) .ant-select-selector {
+  background: #ffffff !important;
+  box-shadow:
+    inset 2px 2px 4px #efe3e3,
+    inset -2px -2px 4px #ffffff,
+    0 0 0 4px rgba(196, 112, 112, 0.2) !important;
+  outline: none !important;
+}
+
+.ant-input-number {
+  width: 100%;
+}
+
+.ant-input-affix-wrapper > input.ant-input {
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.ant-form-item-label > label {
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--clay-foreground);
+  letter-spacing: 0.01em;
+}
+
+.ant-tag {
+  border-radius: 999px !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700;
+  padding: 3px 12px;
+  border: none;
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+}
+
+.ant-dropdown-menu {
+  border-radius: 20px !important;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  box-shadow:
+    12px 12px 24px rgba(180, 150, 150, 0.22),
+    -8px -8px 20px rgba(255, 255, 255, 0.95);
+}
+
+.ant-dropdown-menu-item {
+  border-radius: 12px !important;
+  padding: 9px 14px !important;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-weight: 500;
+  color: var(--clay-foreground) !important;
+
+  &:hover {
+    background: rgba(196, 112, 112, 0.08) !important;
+    color: var(--clay-accent) !important;
+  }
+}
+
+.ant-select-dropdown {
+  border-radius: 18px !important;
+  padding: 8px !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  backdrop-filter: blur(20px);
+  box-shadow:
+    14px 14px 28px rgba(180, 150, 150, 0.22),
+    -8px -8px 20px rgba(255, 255, 255, 0.95) !important;
+  border: none !important;
+}
+
+.ant-select-item {
+  border-radius: 12px !important;
+  padding: 8px 14px !important;
+  margin: 2px 0;
+  font-family: 'DM Sans', system-ui, sans-serif !important;
+  font-weight: 500 !important;
+  color: var(--clay-foreground) !important;
+  transition: all 0.15s ease;
+
+  &:hover,
+  &.ant-select-item-option-active {
+    background: rgba(196, 112, 112, 0.08) !important;
+    color: var(--clay-accent) !important;
+  }
+
+  &.ant-select-item-option-selected {
+    background: linear-gradient(135deg, rgba(217, 139, 139, 0.18) 0%, rgba(196, 112, 112, 0.16) 100%) !important;
+    color: var(--clay-accent) !important;
+    font-weight: 700 !important;
+  }
+}
+
+.ant-table-filter-dropdown {
+  border-radius: 18px !important;
+  padding: 12px !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  backdrop-filter: blur(20px);
+  box-shadow:
+    14px 14px 28px rgba(180, 150, 150, 0.22),
+    -8px -8px 20px rgba(255, 255, 255, 0.95) !important;
+  border: none !important;
+  overflow: hidden;
+
+  .ant-dropdown-menu {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .ant-dropdown-menu-item {
+    border-radius: 12px !important;
+  }
+
+  .ant-table-filter-dropdown-btns {
+    border-top: 1px solid rgba(196, 112, 112, 0.1);
+    padding: 10px 4px 0;
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+
+    .ant-btn-link {
+      color: var(--clay-accent) !important;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      padding: 0 6px;
+      height: 32px;
+    }
+    .ant-btn-primary {
+      height: 32px;
+      border-radius: 16px !important;
+      padding: 0 18px;
+    }
+  }
+
+  .ant-checkbox-wrapper {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-weight: 500;
+    color: var(--clay-foreground);
+  }
+}
+
+.ant-checkbox-inner {
+  border-radius: 6px !important;
+  border-color: rgba(196, 112, 112, 0.3) !important;
+  background: #f5e9e9 !important;
+}
+.ant-checkbox-checked .ant-checkbox-inner {
+  background: linear-gradient(135deg, #d98b8b 0%, #c47070 100%) !important;
+  border-color: transparent !important;
+}
+.ant-checkbox-wrapper:hover .ant-checkbox-inner,
+.ant-checkbox:hover .ant-checkbox-inner {
+  border-color: var(--clay-accent) !important;
+}
+
+.ant-table-filter-trigger {
+  border-radius: 8px !important;
+  &.active,
+  &:hover {
+    color: var(--clay-accent) !important;
+    background: rgba(196, 112, 112, 0.08) !important;
+  }
+}
+
+.ant-popover-inner {
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  box-shadow:
+    12px 12px 24px rgba(180, 150, 150, 0.22),
+    -8px -8px 20px rgba(255, 255, 255, 0.95) !important;
+}
+.ant-popover-inner-content {
+  padding: 16px 18px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+.ant-table {
+  background: transparent !important;
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+.ant-table-thead > tr > th {
+  background: rgba(245, 233, 233, 0.5) !important;
+  border-bottom: none !important;
+  color: var(--clay-foreground) !important;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+
+  &::before {
+    display: none !important;
+  }
+}
+
+.ant-table-tbody > tr > td {
+  border-bottom: 1px solid rgba(196, 112, 112, 0.08) !important;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: rgba(255, 240, 240, 0.5) !important;
+}
+
+.ant-pagination {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ant-pagination-item,
+.ant-pagination-prev,
+.ant-pagination-next {
+  min-width: 36px !important;
+  height: 36px !important;
+  line-height: 34px !important;
+  border-radius: 12px !important;
+  border: none !important;
+  background: #f5e9e9 !important;
+  box-shadow:
+    inset 3px 3px 6px #e3d4d4,
+    inset -3px -3px 6px #ffffff !important;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  margin: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  a, .ant-pagination-item-link {
+    color: var(--clay-foreground) !important;
+    background: transparent !important;
+    border: none !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.ant-pagination-item-active {
+  background: linear-gradient(135deg, #d98b8b 0%, #c47070 100%) !important;
+  box-shadow:
+    8px 8px 16px rgba(196, 112, 112, 0.32),
+    -4px -4px 10px rgba(255, 255, 255, 0.5),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.4),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.08) !important;
+  a {
+    color: #ffffff !important;
+  }
+}
+
+.ant-pagination-options {
+  margin-left: 8px;
+
+  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+    height: 36px !important;
+    min-height: 36px !important;
+    border-radius: 12px !important;
+    padding: 0 12px !important;
+
+    .ant-select-selection-item,
+    .ant-select-selection-placeholder {
+      line-height: 34px !important;
+    }
+  }
+}
+
+.ant-pagination-jump-prev,
+.ant-pagination-jump-next {
+  min-width: 36px !important;
+  height: 36px !important;
+  line-height: 34px !important;
+  margin: 0 !important;
+}
+
+.ant-switch {
+  background: #d9c8c8 !important;
+  box-shadow:
+    inset 2px 2px 4px #c4b5b5,
+    inset -2px -2px 4px #ffffff !important;
+}
+.ant-switch-checked {
+  background: linear-gradient(135deg, #d98b8b 0%, #c47070 100%) !important;
+  box-shadow:
+    inset 2px 2px 4px rgba(196, 112, 112, 0.5),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.3) !important;
+}
+
+.ant-message-notice-content {
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  box-shadow:
+    12px 12px 24px rgba(180, 150, 150, 0.22),
+    -8px -8px 20px rgba(255, 255, 255, 0.95);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-weight: 500;
+  padding: 12px 18px;
+}
+
+.ant-tabs-nav {
+  margin-bottom: 16px !important;
+  display: flex !important;
+  justify-content: flex-start !important;
+
+  &::before {
+    border-bottom: none !important;
+  }
+}
+
+.ant-tabs-nav-wrap {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  align-self: flex-start;
+  background: rgba(245, 233, 233, 0.55);
+  padding: 4px;
+  border-radius: 999px;
+  box-shadow:
+    inset 2px 2px 4px #e3d4d4,
+    inset -2px -2px 4px #ffffff;
+}
+
+.ant-tabs-nav-list {
+  display: inline-flex !important;
+  gap: 2px;
+  transform: none !important;
+}
+
+.ant-tabs-tab {
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  color: var(--clay-muted) !important;
+  border-radius: 999px !important;
+  padding: 8px 20px !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  transition: all 0.25s ease;
+
+  &:hover {
+    color: var(--clay-accent) !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+  }
+}
+
+.ant-tabs-tab + .ant-tabs-tab {
+  margin: 0 !important;
+}
+
+.ant-tabs-tab-active {
+  background: linear-gradient(135deg, #d98b8b 0%, #c47070 100%) !important;
+  box-shadow:
+    0 4px 10px rgba(196, 112, 112, 0.3),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.3),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.08) !important;
+
+  .ant-tabs-tab-btn {
+    color: #FFFFFF !important;
+    text-shadow: 0 1px 2px rgba(74, 63, 63, 0.18);
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, #e09a9a 0%, #b85f5f 100%) !important;
+    .ant-tabs-tab-btn {
+      color: #FFFFFF !important;
+    }
+  }
+}
+
+// Ẩn ink-bar — pill active đã thay thế
+.ant-tabs-ink-bar {
+  display: none !important;
+}
+
+.ant-card {
+  border-radius: 28px !important;
+  border: none !important;
+  background: #fff5f5 !important;
+  box-shadow:
+    0 6px 16px rgba(180, 130, 130, 0.18),
+    0 2px 4px rgba(180, 130, 130, 0.08) !important;
+
+  .ant-card-head {
+    border-bottom: 1px solid rgba(196, 112, 112, 0.08);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+  }
+  .ant-card-head-title {
+    color: var(--clay-foreground);
+  }
+  .ant-card-body {
+    color: var(--clay-foreground);
+  }
+}
+
+.ant-divider {
+  border-color: rgba(196, 112, 112, 0.12) !important;
+}
+
+.ant-descriptions-bordered {
+  .ant-descriptions-view {
+    border-radius: 16px !important;
+    border: 1px solid rgba(196, 112, 112, 0.12) !important;
+    overflow: hidden;
+  }
+
+  .ant-descriptions-item-label,
+  .ant-descriptions-item-content {
+    background: transparent !important;
+    border-right: 1px solid rgba(196, 112, 112, 0.1) !important;
+    border-bottom: 1px solid rgba(196, 112, 112, 0.1) !important;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--clay-foreground);
+    padding: 12px 16px !important;
+  }
+
+  .ant-descriptions-item-label {
+    font-family: 'Nunito', sans-serif !important;
+    font-weight: 700 !important;
+    color: var(--clay-muted) !important;
+    background: rgba(245, 233, 233, 0.45) !important;
+  }
+
+  table tr:last-child .ant-descriptions-item-label,
+  table tr:last-child .ant-descriptions-item-content {
+    border-bottom: none !important;
+  }
+}
+
+.ant-empty-description {
+  color: var(--clay-muted);
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
+
+.ant-radio-button-wrapper {
+  border-radius: 0 !important;
+  border-color: rgba(196, 112, 112, 0.2) !important;
+  font-family: 'Nunito', sans-serif !important;
+  font-weight: 700 !important;
+  color: var(--clay-foreground) !important;
+
+  &:first-child {
+    border-radius: 16px 0 0 16px !important;
+  }
+  &:last-child {
+    border-radius: 0 16px 16px 0 !important;
+  }
+}
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+  background: linear-gradient(135deg, #d98b8b 0%, #c47070 100%) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  &::before {
+    background: transparent !important;
+  }
+}
+
+.ant-spin-dot-item {
+  background: var(--clay-accent) !important;
+}
+
+// Base .ant-btn ép height 40 / padding 0 18px làm button icon-only mất dạng
+// vuông và lệch icon. Khôi phục bằng width vuông + text-align/vertical-align
+// (inline context — KHÔNG dùng display:flex để tránh ẩn icon ở cell fixed-right).
+.ant-btn-icon-only {
+  width: 40px !important;
+  padding: 0 !important;
+  text-align: center;
+}
+.ant-btn-sm.ant-btn-icon-only {
+  width: 32px !important;
+}
+.ant-btn-icon-only > svg {
+  vertical-align: middle;
+}
+// Nút có chữ (không phải icon-only): flex căn giữa icon+chữ cả ngang lẫn dọc,
+// gap thay cho margin (AntD chỉ tự spacing cho .anticon, không cho svg lucide).
+// Loại trừ icon-only để không tái diễn lỗi ẩn icon ở cell fixed-right.
+.ant-btn:not(.ant-btn-icon-only) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.ant-btn-block {
+  display: flex !important;
+  width: 100%;
+}
+
+// Claymorphism ép height 42px / radius 20px / padding 16px khiến input nhỏ
+// trong cell bị méo và che mất giá trị. Thu gọn để gõ thấy chữ.
+.so-items-table {
+  .ant-input:not(textarea),
+  .ant-input-number {
+    height: 32px !important;
+    min-height: 32px !important;
+    border-radius: 10px !important;
+  }
+
+  .ant-input-number {
+    width: 72px !important;
+
+    .ant-input-number-input-wrap,
+    .ant-input-number-input {
+      height: 30px !important;
+      line-height: 30px !important;
+      padding: 0 10px !important;
+    }
+  }
+
+  .ant-input:not(textarea) {
+    line-height: 30px !important;
+    padding: 0 10px !important;
+  }
+}
