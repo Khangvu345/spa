@@ -72,19 +72,17 @@ export class BookingController {
   }
 
   @Get('availability/grid')
-  @Public()
+  @Roles(StaffRole.OPERATOR, StaffRole.ADMIN)
   @ApiOperation({ summary: 'Full grid slot availability cho operator' })
   @ApiOkResponse({ type: AvailabilityGridResponseDto })
   async getAvailabilityGrid(@Query() query: GetAvailabilityDto) {
-    const slots = await this.slotAvailabilityService.getFullGrid(
-      query.serviceId,
-      query.date,
-    );
-
     return {
       date: query.date,
       serviceId: query.serviceId,
-      slots: slots.map(({ time, status }) => ({ time, status })),
+      slots: await this.slotAvailabilityService.getFullGrid(
+        query.serviceId,
+        query.date,
+      ),
     };
   }
 

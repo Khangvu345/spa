@@ -248,11 +248,18 @@ export class SlotAvailabilityService {
   }
 
   private parseDateOnly(date: string): Date {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      throw new BadRequestException({
+        code: ERROR_CODES.VALIDATION_FAILED,
+        message: 'date phai co dinh dang YYYY-MM-DD',
+      });
+    }
+
     const result = parseVietnamDateOnly(date);
     if (!result) {
       throw new BadRequestException({
         code: ERROR_CODES.VALIDATION_FAILED,
-        message: 'date phai co dinh dang YYYY-MM-DD',
+        message: 'date khong hop le',
       });
     }
 
