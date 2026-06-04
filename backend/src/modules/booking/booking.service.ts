@@ -6,8 +6,19 @@ import {
 } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Connection, Model, Types } from 'mongoose';
-import { DEFAULT_PAGE, MAX_LIMIT } from '../../shared/constants/business-rules';
+import {
+  BOOKING_SLOT_STEP_MINUTES,
+  BUSINESS_HOUR_END,
+  BUSINESS_HOUR_START,
+  DEFAULT_PAGE,
+  MAX_LIMIT,
+} from '../../shared/constants/business-rules';
 import { ERROR_CODES } from '../../shared/constants/error-codes';
+import {
+  createVietnamDateTime,
+  getVietnamDateTimeParts,
+  parseVietnamDateTime,
+} from '../../shared/utils/vietnam-time.util';
 import type { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
 import { CustomerResponseDto } from '../customer/dto/customer-response.dto';
 import { CustomerService } from '../customer/customer.service';
@@ -620,8 +631,8 @@ export class BookingService {
   }
 
   private parseDateTime(value: string): Date {
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
+    const date = parseVietnamDateTime(value);
+    if (!date) {
       throw new BadRequestException({
         code: ERROR_CODES.VALIDATION_FAILED,
         message: 'scheduledStart khong hop le',
@@ -644,20 +655,29 @@ export class BookingService {
     service: ServiceResponseDto,
     scheduledStart: Date,
   ): void {
-    const openTime = new Date(scheduledStart);
-    openTime.setHours(8, 0, 0, 0);
-    const closeTime = new Date(scheduledStart);
-    closeTime.setHours(22, 0, 0, 0);
+    const vietnamTime = getVietnamDateTimeParts(scheduledStart);
+    const openTime = createVietnamDateTime(
+      vietnamTime.year,
+      vietnamTime.month,
+      vietnamTime.day,
+      BUSINESS_HOUR_START,
+    );
+    const closeTime = createVietnamDateTime(
+      vietnamTime.year,
+      vietnamTime.month,
+      vietnamTime.day,
+      BUSINESS_HOUR_END,
+    );
     const scheduledEnd = this.addMinutes(
       scheduledStart,
       service.durationMinutes + service.bufferMinutes,
     );
     const minutesFromOpen =
-      (scheduledStart.getHours() - 8) * 60 + scheduledStart.getMinutes();
+      (vietnamTime.hour - BUSINESS_HOUR_START) * 60 + vietnamTime.minute;
     const isAlignedToStep =
-      scheduledStart.getSeconds() === 0 &&
-      scheduledStart.getMilliseconds() === 0 &&
-      minutesFromOpen % 30 === 0;
+      vietnamTime.second === 0 &&
+      vietnamTime.millisecond === 0 &&
+      minutesFromOpen % BOOKING_SLOT_STEP_MINUTES === 0;
 
     if (
       scheduledStart.getTime() < openTime.getTime() ||

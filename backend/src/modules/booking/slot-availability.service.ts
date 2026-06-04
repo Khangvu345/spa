@@ -1,7 +1,21 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import {
+  BOOKING_SLOT_STEP_MINUTES,
+  BUSINESS_HOUR_END,
+  BUSINESS_HOUR_START,
+  DEFAULT_BOOKING_BUFFER_MINUTES,
+} from '../../shared/constants/business-rules';
 import { ERROR_CODES } from '../../shared/constants/error-codes';
+import {
+  addVietnamDays,
+  createVietnamDateTime,
+  formatVietnamDateKey,
+  formatVietnamTime,
+  getVietnamDateTimeParts,
+  parseVietnamDateOnly,
+} from '../../shared/utils/vietnam-time.util';
 import { ServiceResponseDto } from '../service/dto/service-response.dto';
 import { ServiceService } from '../service/service.service';
 import { AssignmentResponseDto } from '../staff-service-assignment/dto/assignment-response.dto';
@@ -42,10 +56,10 @@ const BLOCKING_STATUSES = [
 
 @Injectable()
 export class SlotAvailabilityService {
-  readonly OPEN_HOUR = 8;
-  readonly CLOSE_HOUR = 22;
-  readonly SLOT_STEP_MINUTES = 30;
-  readonly BUFFER_MINUTES = 15;
+  readonly OPEN_HOUR = BUSINESS_HOUR_START;
+  readonly CLOSE_HOUR = BUSINESS_HOUR_END;
+  readonly SLOT_STEP_MINUTES = BOOKING_SLOT_STEP_MINUTES;
+  readonly BUFFER_MINUTES = DEFAULT_BOOKING_BUFFER_MINUTES;
 
   constructor(
     @InjectModel(Booking.name)
@@ -130,16 +144,26 @@ export class SlotAvailabilityService {
       .exec();
 
     const slots: SlotInfo[] = [];
-    const closeTime = new Date(context.dayStart);
-    closeTime.setHours(this.CLOSE_HOUR, 0, 0, 0);
+    const dayParts = getVietnamDateTimeParts(context.dayStart);
+    const closeTime = createVietnamDateTime(
+      dayParts.year,
+      dayParts.month,
+      dayParts.day,
+      this.CLOSE_HOUR,
+    );
 
     for (
       let minutes = this.OPEN_HOUR * 60;
       minutes < this.CLOSE_HOUR * 60;
       minutes += this.SLOT_STEP_MINUTES
     ) {
-      const slotStart = new Date(context.dayStart);
-      slotStart.setHours(Math.floor(minutes / 60), minutes % 60, 0, 0);
+      const slotStart = createVietnamDateTime(
+        dayParts.year,
+        dayParts.month,
+        dayParts.day,
+        Math.floor(minutes / 60),
+        minutes % 60,
+      );
       const slotEnd = this.addMinutes(slotStart, totalBlockTime);
 
       if (slotEnd.getTime() > closeTime.getTime()) {
@@ -187,8 +211,7 @@ export class SlotAvailabilityService {
       this.resolveAssignment(serviceId),
     ]);
     const dayStart = this.parseDateOnly(date);
-    const dayEnd = new Date(dayStart);
-    dayEnd.setDate(dayEnd.getDate() + 1);
+    const dayEnd = addVietnamDays(dayStart, 1);
 
     return { service, assignment, dayStart, dayEnd };
   }
@@ -225,26 +248,11 @@ export class SlotAvailabilityService {
   }
 
   private parseDateOnly(date: string): Date {
-    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
-    if (!match) {
+    const result = parseVietnamDateOnly(date);
+    if (!result) {
       throw new BadRequestException({
         code: ERROR_CODES.VALIDATION_FAILED,
         message: 'date phai co dinh dang YYYY-MM-DD',
-      });
-    }
-
-    const year = Number(match[1]);
-    const month = Number(match[2]);
-    const day = Number(match[3]);
-    const result = new Date(year, month - 1, day, 0, 0, 0, 0);
-    if (
-      result.getFullYear() !== year ||
-      result.getMonth() !== month - 1 ||
-      result.getDate() !== day
-    ) {
-      throw new BadRequestException({
-        code: ERROR_CODES.VALIDATION_FAILED,
-        message: 'date khong hop le',
       });
     }
 
@@ -252,18 +260,11 @@ export class SlotAvailabilityService {
   }
 
   private formatDateKey(date: Date): string {
-    return [
-      date.getFullYear(),
-      String(date.getMonth() + 1).padStart(2, '0'),
-      String(date.getDate()).padStart(2, '0'),
-    ].join('-');
+    return formatVietnamDateKey(date);
   }
 
   private formatTime(date: Date): string {
-    return [
-      String(date.getHours()).padStart(2, '0'),
-      String(date.getMinutes()).padStart(2, '0'),
-    ].join(':');
+    return formatVietnamTime(date);
   }
 
   private addMinutes(date: Date, minutes: number): Date {

@@ -16,6 +16,9 @@ export const NO_SHOW_TIMEOUT_MINUTES = 30;
 /** Giờ làm việc (BR3) */
 export const BUSINESS_HOUR_START = 8;
 export const BUSINESS_HOUR_END = 22;
+export const BUSINESS_TIME_ZONE = 'Asia/Ho_Chi_Minh';
+export const BUSINESS_TIME_ZONE_OFFSET_MINUTES = 7 * 60;
+export const BOOKING_SLOT_STEP_MINUTES = 30;
 
 /** Số giờ tối thiểu trước scheduled_at có thể cancel (BR8) */
 export const MIN_CANCEL_HOURS_BEFORE = 2;
