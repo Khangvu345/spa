@@ -1,5 +1,5 @@
-# Spa Management System
- 
+# HỆ THỐNG QUẢN LÝ CƠ SỞ KINH DOANH SPA
+
 > Hệ thống quản lý toàn diện hoạt động Spa. Bao gồm đặt lịch, tiếp nhận, thanh toán, kho vật liệu, nhân sự và báo cáo.
  
 ---
@@ -8,9 +8,9 @@
  
 | Thông tin | Chi tiết |
 |---|---|
-| **Tên dự án** | Spa Management System |
+| **Tên dự án** | Hệ thống quản lý cơ sở kinh doanh Spa |
 | **Loại** | Web Application — Monolith |
-| **Môn học** | Lập trình Web (Cuối kỳ) |
+| **Môn học** | Thực hành lập trình web |
 | **Stack** | NestJS · React (base-web-umi) · MongoDB · TypeScript |
  
 ### Mục tiêu hệ thống
@@ -75,21 +75,80 @@ Backend và Documents nằm trực tiếp trong repo cha, commit/push bình thư
  
 ##  Bắt đầu nhanh
  
+Do frontend và backend dùng 2 phiên bản Node.js khác nhau, nên dùng `fnm` để chuyển version theo từng thư mục:
 
-### Chạy bằng Docker (khuyến nghị)
-```bash
-git clone  spa-management
-cd spa-management
+- **Frontend**: Node.js 16 LTS, React 17 + Umi, dùng Yarn classic
+- **Backend**: Node.js 24 LTS, NestJS, dùng npm
 
-cp .env.example .env
-docker compose up -d
+### 1. Cài fnm và Node.js
+
+```powershell
+# Windows PowerShell
+winget install Schniz.fnm
 ```
-| Service | URL |
-|---|---|
-| Frontend | http://localhost: |
-| Backend API | http://localhost: |
-| Swagger UI | http://localhost:.../api
-| MongoDB | mongodb://localhost: |
+
+Đóng và mở lại terminal, sau đó cài 2 version Node.js cần dùng:
+
+```powershell
+fnm install 16
+fnm install 24
+fnm list
+```
+
+Nếu PowerShell chưa tự nhận `fnm`, thêm dòng sau vào `$PROFILE`, rồi mở lại terminal:
+
+```powershell
+fnm env --use-on-cd | Out-String | Invoke-Expression
+```
+
+### 2. Chạy backend
+
+```powershell
+cd backend
+fnm use 24
+npm install
+Copy-Item .env.example .env
+npm run start:dev
+```
+
+Backend mặc định chạy tại:
+
+- REST API: `http://localhost:3000/api/v1`
+- Swagger UI: `http://localhost:3000/api-docs`
+- Swagger JSON: `http://localhost:3000/api-docs-json`
+
+Nếu cần tạo tài khoản admin demo:
+
+```powershell
+npm run seed:admin
+```
+
+### 3. Chạy frontend
+
+Mở một terminal khác:
+
+```powershell
+cd frontend
+fnm use 16
+npm install --global yarn
+yarn install
+Copy-Item .env.example .env
+```
+
+Trong `frontend/.env`, chỉnh URL backend:
+
+```env
+APP_CONFIG_API_URL=http://localhost:3000/api/v1
+```
+
+Chạy frontend ở port `8000` để khớp `CORS_ORIGIN` mặc định của backend và tránh trùng port `3000`:
+
+```powershell
+$env:PORT=8000
+yarn start
+```
+
+Truy cập frontend tại `http://localhost:8000`.
  
 ---
  ## Tài liệu
