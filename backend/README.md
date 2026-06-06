@@ -161,8 +161,6 @@ BE (NestJS)                              FE (Umi 4)
 |---|---|
 | Node.js | **24 LTS** |
 | npm | >= 9.x |
-| Docker | >= 24.x |
-| Docker Compose | >= 2.x |
  
 > Dùng `fnm` để quản lý Node version: `fnm use 24`
  
@@ -205,9 +203,9 @@ npm run start:dev
  
 | Địa chỉ | Mô tả |
 |---|---|
-| http://localhost:8000/api/v1 | REST API |
-| http://localhost:8000/api-docs | Swagger UI — xem và test API |
-| http://localhost:8000/api-docs-json | swagger.json — FE dùng để generate types |
+| http://localhost:3000/api/v1 | REST API |
+| http://localhost:3000/api-docs | Swagger UI — xem và test API |
+| http://localhost:3000/api-docs-json | swagger.json — FE dùng để generate types |
  
 ---
  

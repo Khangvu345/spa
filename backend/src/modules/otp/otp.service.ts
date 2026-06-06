@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -34,6 +35,8 @@ import type { IOtpProvider } from './providers/otp-provider.interface';
 
 @Injectable()
 export class OtpService {
+  private readonly logger = new Logger(OtpService.name);
+
   constructor(
     @InjectModel(OtpCode.name)
     private readonly otpCodeModel: Model<OtpCodeDocument>,
@@ -132,6 +135,8 @@ export class OtpService {
     booking.otpAttempts = otp.attemptCount;
 
     await Promise.all([otp.save(), booking.save()]);
+    const confirmedBooking = await this.bookingService.findOne(bookingId);
+    await this.sendBookingConfirmation(confirmedBooking);
 
     return { confirmed: true };
   }
@@ -235,6 +240,39 @@ export class OtpService {
     booking.cancelledAt = new Date();
     booking.cancelReason = 'Nhập sai OTP quá số lần cho phép';
     await booking.save();
+  }
+
+  private async sendBookingConfirmation(
+    booking: BookingResponseDto,
+  ): Promise<void> {
+    const email = booking.customerSnapshot.email?.trim().toLowerCase();
+    if (!email) {
+      this.logger.warn(
+        `Skip booking confirmation email because booking ${booking.id} has no email`,
+      );
+      return;
+    }
+
+    try {
+      await this.otpProvider.sendBookingConfirmed(email, booking);
+    } catch (error) {
+      this.logger.warn(
+        `Booking ${booking.id} confirmed but confirmation email failed: ${this.getErrorMessage(error)}`,
+      );
+    }
+  }
+
+  private getErrorMessage(error: unknown): string {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'message' in error &&
+      typeof (error as { message?: unknown }).message === 'string'
+    ) {
+      return (error as { message: string }).message;
+    }
+
+    return 'Unknown error';
   }
 
   private generateCode(): string {

@@ -46,6 +46,9 @@ interface ServiceGroupRaw {
 }
 
 const DASHBOARD_TOP_SERVICES_LIMIT = 5;
+const EXCEL_REVENUE_BREAKDOWN_NOTE =
+  'Doanh thu theo dịch vụ chưa phân bổ giảm giá toàn hóa đơn, nên tổng doanh thu theo từng dịch vụ có thể khác tổng doanh thu đã thanh toán.';
+const EXCEL_ALL_SERVICES_LABEL = 'Tất cả dịch vụ';
 
 /** Map kết quả $group theo dịch vụ sang DTO (module-level, không phụ thuộc this). */
 function mapServiceRow(raw: ServiceGroupRaw): ServiceRevenueRowDto {
@@ -380,10 +383,14 @@ export class ReportsService {
     const report = await this.getRevenueReport(query);
 
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = 'Spa Management';
+    workbook.creator = 'Hệ thống quản lý Spa';
     workbook.created = new Date();
 
     const MONEY_FORMAT = '#,##0';
+    const selectedServiceName =
+      query.serviceId
+        ? (report.breakdown[0]?.serviceName ?? 'Dịch vụ đã chọn')
+        : EXCEL_ALL_SERVICES_LABEL;
 
     // Sheet 1 — Tổng quan
     const overview = workbook.addWorksheet('Tổng quan');
@@ -395,8 +402,8 @@ export class ReportsService {
     overview.addRow({ label: 'Từ ngày', value: report.period.fromDate });
     overview.addRow({ label: 'Đến ngày', value: report.period.toDate });
     overview.addRow({
-      label: 'Lọc dịch vụ',
-      value: report.serviceId ?? '(toàn bộ)',
+      label: 'Dịch vụ',
+      value: selectedServiceName,
     });
     const totalRow = overview.addRow({
       label: 'Tổng doanh thu',
@@ -405,14 +412,14 @@ export class ReportsService {
     totalRow.getCell('value').numFmt = MONEY_FORMAT;
     overview.addRow({ label: 'Số hóa đơn', value: report.invoiceCount });
     overview.addRow({});
-    overview.addRow({ label: 'Ghi chú', value: report.note });
+    overview.addRow({ label: 'Ghi chú', value: EXCEL_REVENUE_BREAKDOWN_NOTE });
 
     // Sheet 2 — Theo dịch vụ
     const byService = workbook.addWorksheet('Theo dịch vụ');
     byService.columns = [
       { header: 'Dịch vụ', key: 'serviceName', width: 32 },
-      { header: 'Số lượt', key: 'count', width: 14 },
-      { header: 'Doanh thu', key: 'revenue', width: 20 },
+      { header: 'Số lượt phục vụ', key: 'count', width: 18 },
+      { header: 'Doanh thu dịch vụ', key: 'revenue', width: 22 },
     ];
     byService.getRow(1).font = { bold: true };
     for (const row of report.breakdown) {
