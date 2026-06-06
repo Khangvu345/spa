@@ -1,6 +1,13 @@
 # HỆ THỐNG QUẢN LÝ CƠ SỞ KINH DOANH SPA
 
 > Hệ thống quản lý toàn diện hoạt động Spa. Bao gồm đặt lịch, tiếp nhận, thanh toán, kho vật liệu, nhân sự và báo cáo.
+
+## Liên kết repository
+
+| # | Loại repo | Đường dẫn |
+|---|---|---|
+| 1 | Repo parent hiện tại | [RIPT1307-3-KTHP](https://github.com/Khangvu345/RIPT1307-3-KTHP) |
+| 2 | Repo child frontend | [SPA_WEB_FRONTEND](https://github.com/congpx-udu/SPA_WEB_FRONTEND) |
  
 ---
  
