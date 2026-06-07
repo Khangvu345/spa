@@ -1,4 +1,31 @@
-export default [
+// Routes tách theo APP_CONFIG_TARGET:
+//   - landing : chỉ trang công khai (landing + đặt lịch + feedback).  '/' = landing.
+//   - admin   : login + toàn bộ hệ thống quản lý, KHÔNG có landing.   '/' redirect '/login'.
+//   - (dev)   : khi `yarn start` không set target → gộp cả hai để dev tiện thử.
+const target = process.env.APP_CONFIG_TARGET;
+const isLanding = target === 'landing';
+const isAdmin = target === 'admin';
+
+// ── Trang công khai (chỉ thuộc bản landing) ──
+const landingRoutes = [
+	{
+		path: '/',
+		name: 'LandingPage',
+		component: './landingPage',
+		layout: false,
+		hideInMenu: true,
+	},
+	{
+		path: '/feedback',
+		name: 'Feedback',
+		component: './landingPage/components/FeedbackPage',
+		layout: false,
+		hideInMenu: true,
+	},
+];
+
+// ── Login (Keycloak legacy) ──
+const userRoutes = [
 	{
 		path: '/user',
 		layout: false,
@@ -15,14 +42,10 @@ export default [
 			},
 		],
 	},
+];
 
-	{
-		path: '/',
-		name: 'LandingPage',
-		component: './landingPage',
-		layout: false,
-		hideInMenu: true,
-	},
+// ── Auth của hệ thống quản lý ──
+const authRoutes = [
 	{
 		path: '/login',
 		name: 'Login',
@@ -44,16 +67,10 @@ export default [
 		hideInMenu: true,
 		access: 'canAny',
 	},
-	{
-		path: '/feedback',
-		name: 'Feedback',
-		component: './landingPage/components/FeedbackPage',
-		layout: false,
-		hideInMenu: true,
-	},
+];
 
-	///////////////////////////////////
-	// SPA MANAGEMENT MENU — phân quyền theo StaffRole (ADMIN / OPERATOR / STAFF)
+// ── Menu hệ thống quản lý — phân quyền theo StaffRole (ADMIN / OPERATOR / STAFF) ──
+const managementRoutes = [
 	{
 		path: '/admin/dashboard',
 		name: 'Dashboard',
@@ -114,6 +131,13 @@ export default [
 		access: 'canAdmin',
 	},
 	{
+		path: '/bang-luong',
+		name: 'Bảng lương',
+		component: './admin/Payroll',
+		icon: 'WalletOutlined',
+		access: 'canAdmin',
+	},
+	{
 		path: '/kho-dashboard',
 		name: 'Kho vật liệu',
 		component: './admin/InventoryDashboard',
@@ -141,6 +165,10 @@ export default [
 		icon: 'ShopOutlined',
 		access: 'canAdmin',
 	},
+];
+
+// ── Route ngoại lệ (dùng chung) ──
+const exceptionRoutes = [
 	{
 		path: '/403',
 		component: './exception/403/403Page',
@@ -151,7 +179,34 @@ export default [
 		component: './exception/DangCapNhat',
 		layout: false,
 	},
-	{
-		component: './exception/404',
-	},
 ];
+
+const notFound = { component: './exception/404', layout: false };
+
+let routes: any[];
+if (isLanding) {
+	// Bản landing: chỉ trang công khai, không kèm login/quản lý.
+	routes = [...landingRoutes, ...exceptionRoutes, notFound];
+} else if (isAdmin) {
+	// Bản quản lý: vào thẳng login, không có landing.
+	routes = [
+		...userRoutes,
+		{ path: '/', redirect: '/login' },
+		...authRoutes,
+		...managementRoutes,
+		...exceptionRoutes,
+		notFound,
+	];
+} else {
+	// Dev (yarn start): gộp cả hai. '/' = landing như trước.
+	routes = [
+		...userRoutes,
+		...landingRoutes,
+		...authRoutes,
+		...managementRoutes,
+		...exceptionRoutes,
+		notFound,
+	];
+}
+
+export default routes;

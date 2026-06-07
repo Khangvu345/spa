@@ -23,6 +23,7 @@ import {
 import { useModel } from 'umi';
 import { Plus, Trash2, Check, X, MoreHorizontal, Pencil } from 'lucide-react';
 import * as materialsApi from '@/services/Materials/api';
+import { fmtQty } from '@/services/Materials/constant';
 
 type Props = {
 	open: boolean;
@@ -120,7 +121,7 @@ export default function BomDrawer({ open, service, onClose }: Props) {
 				<div>
 					<div style={{ fontWeight: 500 }}>{v}</div>
 					<div style={{ fontSize: 11, color: '#6B7280' }}>
-						{r.material?.type === 'DEPRECIATION' ? 'Khấu hao' : 'Tiêu hao'} • Tồn: {r.material?.stockQuantity}
+						{r.material?.type === 'DEPRECIATION' ? 'Khấu hao' : 'Tiêu hao'} • Tồn: {fmtQty(r.material?.stockQuantity)}
 					</div>
 				</div>
 			),

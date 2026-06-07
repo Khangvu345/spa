@@ -44,9 +44,14 @@ declare namespace SvcMgmt {
 		bufferMinutes?: number;
 		slotsRequired?: number;
 		description?: string;
-		imageUrl?: string;
+		imageUrl?: string | null;
 		isActive?: boolean;
 	}
 
-	export interface IUpdatePayload extends Partial<ICreatePayload> {}
+	export type IUpdatePayload = Partial<ICreatePayload>;
+
+	export interface IUploadImageResponse {
+		url: string;
+		publicId: string;
+	}
 }

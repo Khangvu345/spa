@@ -1,16 +1,19 @@
 // Modal xác thực OTP email cho luồng đặt lịch landing page.
 // BE: mã 6 chữ số, hiệu lực 10 phút, tối đa 3 lần, cooldown gửi lại 120s.
 import { useEffect, useState } from 'react';
-import { Modal, Input, Button } from 'antd';
+import { Modal, Input, Button, Alert } from 'antd';
 import { ShieldCheck, Mail, RotateCw } from 'lucide-react';
+
+type VerifyResult = { ok: boolean; error: string; closed?: boolean };
+type ResendResult = { ok: boolean; error: string };
 
 type Props = {
 	open: boolean;
 	email?: string;
 	verifying?: boolean;
 	resending?: boolean;
-	onVerify: (code: string) => Promise<boolean>;
-	onResend: () => Promise<boolean>;
+	onVerify: (code: string) => Promise<VerifyResult>;
+	onResend: () => Promise<ResendResult>;
 	onClose: () => void;
 };
 
@@ -29,12 +32,14 @@ function maskEmail(email?: string): string {
 export default function OtpModal({ open, email, verifying, resending, onVerify, onResend, onClose }: Props) {
 	const [code, setCode] = useState('');
 	const [cooldown, setCooldown] = useState(RESEND_COOLDOWN);
+	const [otpError, setOtpError] = useState('');
 
 	// Mở modal: reset mã + bắt đầu đếm ngược cooldown gửi lại.
 	useEffect(() => {
 		if (open) {
 			setCode('');
 			setCooldown(RESEND_COOLDOWN);
+			setOtpError('');
 		}
 	}, [open]);
 
@@ -45,15 +50,23 @@ export default function OtpModal({ open, email, verifying, resending, onVerify, 
 	}, [open, cooldown]);
 
 	const handleVerify = async () => {
-		const ok = await onVerify(code);
-		if (!ok) setCode(''); // sai mã → xoá để nhập lại
+		setOtpError('');
+		const r = await onVerify(code);
+		if (!r.ok) {
+			setCode(''); // sai mã → xoá để nhập lại
+			// closed = booking đã bị huỷ → modal tự đóng, lỗi hiện ở ngoài form. Còn lại báo ngay trong modal.
+			if (!r.closed) setOtpError(r.error);
+		}
 	};
 
 	const handleResend = async () => {
-		const ok = await onResend();
-		if (ok) {
+		setOtpError('');
+		const r = await onResend();
+		if (r.ok) {
 			setCode('');
 			setCooldown(RESEND_COOLDOWN);
+		} else {
+			setOtpError(r.error);
 		}
 	};
 
@@ -89,6 +102,17 @@ export default function OtpModal({ open, email, verifying, resending, onVerify, 
 						<strong>{maskEmail(email)}</strong>. Mã có hiệu lực trong 10 phút.
 					</div>
 				</div>
+
+				{otpError && (
+					<Alert
+						type='error'
+						showIcon
+						closable
+						message={otpError}
+						onClose={() => setOtpError('')}
+						style={{ borderRadius: 12 }}
+					/>
+				)}
 
 				<Input
 					value={code}

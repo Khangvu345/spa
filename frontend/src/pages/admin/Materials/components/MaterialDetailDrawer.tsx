@@ -1,15 +1,16 @@
 // Drawer chi tiết vật liệu — thông tin + tab Lịch sử kho.
 import { useEffect, useState } from 'react';
-import { Drawer, Tabs, Tag, Empty, Table, Spin, Descriptions } from 'antd';
+import { Modal, Tabs, Tag, Empty, Table, Spin, Descriptions } from 'antd';
 import moment from 'moment';
 import { History, Info, Sparkles } from 'lucide-react';
+import './MaterialDetailDrawer.less';
 import * as ledgerApi from '@/services/StockLedger/api';
 import * as bomApi from '@/services/Bom/api';
 import {
 	TRANSACTION_TYPE_OPTIONS,
 	REFERENCE_TYPE_LABEL,
 } from '@/services/StockLedger/constant';
-import { MATERIAL_TYPE_OPTIONS } from '@/services/Materials/constant';
+import { MATERIAL_TYPE_OPTIONS, fmtQty } from '@/services/Materials/constant';
 
 type Props = {
 	open: boolean;
@@ -57,18 +58,20 @@ export default function MaterialDetailDrawer({ open, material, onClose }: Props)
 	const low = material.stockQuantity <= material.reorderLevel;
 
 	return (
-		<Drawer
+		<Modal
 			title={
 				<div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
 					<span style={{ fontWeight: 600 }}>{material.name}</span>
 					<code style={{ fontSize: 12, color: '#6B7280' }}>{material.code}</code>
 				</div>
 			}
-			placement='right'
 			width={720}
-			onClose={onClose}
+			centered
+			footer={null}
+			onCancel={onClose}
 			visible={open}
 			bodyStyle={{ padding: 0 }}
+			className='material-detail-modal'
 		>
 			<Tabs activeKey={activeTab} onChange={setActiveTab} style={{ padding: '0 24px' }}>
 				<Tabs.TabPane
@@ -79,7 +82,7 @@ export default function MaterialDetailDrawer({ open, material, onClose }: Props)
 						</span>
 					}
 				>
-					<Descriptions column={2} bordered size='small' labelStyle={{ width: 140 }}>
+					<Descriptions column={{ xs: 1, sm: 2 }} bordered size='small' labelStyle={{ width: 140 }}>
 						<Descriptions.Item label='Mã'>
 							<code>{material.code}</code>
 						</Descriptions.Item>
@@ -90,11 +93,11 @@ export default function MaterialDetailDrawer({ open, material, onClose }: Props)
 						<Descriptions.Item label='Đơn vị'>{material.unit}</Descriptions.Item>
 						<Descriptions.Item label='Tồn kho'>
 							<strong style={{ color: low ? '#DC2626' : '#059669' }}>
-								{material.stockQuantity} {material.unit}
+								{fmtQty(material.stockQuantity)} {material.unit}
 							</strong>
 						</Descriptions.Item>
 						<Descriptions.Item label='Tối thiểu'>
-							{material.reorderLevel} {material.unit}
+							{fmtQty(material.reorderLevel)} {material.unit}
 						</Descriptions.Item>
 						<Descriptions.Item label='Giá nhập'>{fmtVnd(material.unitPrice)}</Descriptions.Item>
 						<Descriptions.Item label='Dự kiến sử dụng'>
@@ -161,7 +164,7 @@ export default function MaterialDetailDrawer({ open, material, onClose }: Props)
 										render: (v: number) => (
 											<span style={{ color: v >= 0 ? '#059669' : '#DC2626', fontWeight: 600 }}>
 												{v >= 0 ? '+' : ''}
-												{v}
+												{fmtQty(v)}
 											</span>
 										),
 									},
@@ -170,7 +173,7 @@ export default function MaterialDetailDrawer({ open, material, onClose }: Props)
 										dataIndex: 'stockAfter',
 										width: 80,
 										align: 'center' as const,
-										render: (v: number) => <strong>{v}</strong>,
+										render: (v: number) => <strong>{fmtQty(v)}</strong>,
 									},
 									{
 										title: 'Người',
@@ -252,6 +255,6 @@ export default function MaterialDetailDrawer({ open, material, onClose }: Props)
 					</Spin>
 				</Tabs.TabPane>
 			</Tabs>
-		</Drawer>
+		</Modal>
 	);
 }

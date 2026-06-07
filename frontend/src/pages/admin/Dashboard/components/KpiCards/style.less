@@ -65,3 +65,44 @@
 		color: var(--clay-muted);
 	}
 }
+
+// ---- Điện thoại (<576px): 2 thẻ/hàng, thu gọn cho vừa và đỡ trống ----
+@media (max-width: 575px) {
+	.spa-dashboard .kpi-card,
+	.kpi-card {
+		padding: 14px !important;
+		gap: 6px !important;
+		border-radius: 18px !important;
+
+		// Icon + trend xếp dọc để text "so với hôm qua" đủ chỗ ở thẻ hẹp.
+		.kpi-top {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 8px;
+		}
+
+		.kpi-icon {
+			width: 36px !important;
+			height: 36px !important;
+			border-radius: 12px !important;
+
+			span {
+				font-size: 16px !important;
+			}
+		}
+
+		.kpi-trend {
+			font-size: 10px !important;
+			padding: 3px 8px !important;
+		}
+
+		.kpi-value {
+			font-size: 20px !important;
+		}
+
+		.kpi-label {
+			font-size: 11.5px !important;
+			line-height: 1.3;
+		}
+	}
+}

@@ -1,0 +1,120 @@
+.reports-panel {
+	background: #fff5f5;
+	border-radius: 28px;
+	padding: 24px;
+	box-shadow:
+		0 6px 16px rgba(180, 130, 130, 0.18),
+		0 2px 4px rgba(180, 130, 130, 0.08);
+
+	&__header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 16px;
+		flex-wrap: wrap;
+		margin-bottom: 12px;
+
+		h3 {
+			font-family: 'Nunito', sans-serif;
+			font-size: 16px;
+			font-weight: 800;
+			color: var(--clay-foreground);
+			margin: 0 0 4px;
+		}
+	}
+
+	&__summary {
+		font-family: 'DM Sans', sans-serif;
+		font-size: 12px;
+		font-weight: 500;
+		color: var(--clay-muted);
+
+		b {
+			color: var(--clay-foreground);
+		}
+	}
+
+	&__actions {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		flex-wrap: wrap;
+	}
+
+	// Hàng chip lọc nhanh — mặc định ẩn (desktop), chỉ bật ở mobile.
+	&__quick {
+		display: none;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-bottom: 14px;
+	}
+
+	&__chip {
+		padding: 7px 14px;
+		border-radius: 999px;
+		border: 1px solid rgba(196, 112, 112, 0.25);
+		background: #fff;
+		font-family: 'Nunito', sans-serif;
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--clay-muted);
+		cursor: pointer;
+		transition: all 0.15s ease;
+
+		&.is-active {
+			background: linear-gradient(135deg, #d98b8b 0%, #c47070 100%);
+			border-color: transparent;
+			color: #fff;
+			box-shadow: 0 4px 12px rgba(196, 112, 112, 0.3);
+		}
+	}
+}
+
+@media (max-width: 768px) {
+	.reports-panel__quick {
+		display: flex;
+	}
+}
+
+// ---- Responsive mobile ----
+@media (max-width: 768px) {
+	// Thanh lọc chiếm hết chiều ngang, RangePicker giãn full.
+	.reports-panel__actions {
+		width: 100%;
+
+		.ant-picker {
+			flex: 1 1 auto;
+		}
+	}
+}
+
+// Modal drill-down hoá đơn (render qua portal ở body) — co theo màn hình.
+@media (max-width: 768px) {
+	.ant-modal.reports-invoices-modal {
+		max-width: calc(100vw - 24px);
+		width: calc(100vw - 24px) !important;
+		margin: 12px auto;
+	}
+}
+
+// Lịch RangePicker (render ở body): mặc định 2 tháng cạnh nhau → tràn mobile.
+// Trên mobile chỉ hiện 1 tháng + bật lại nút lật tháng ở panel còn lại.
+@media (max-width: 768px) {
+	.reports-range-dropdown {
+		.ant-picker-range-wrapper {
+			min-width: 0 !important;
+			max-width: calc(100vw - 16px);
+		}
+		// ẩn tháng thứ 2
+		.ant-picker-panels > .ant-picker-panel + .ant-picker-panel {
+			display: none !important;
+		}
+		// panel còn lại: hiện lại nút Next / Next-năm để vẫn lật tháng được
+		.ant-picker-panels .ant-picker-panel:first-child {
+			.ant-picker-header-next-btn,
+			.ant-picker-header-super-next-btn {
+				visibility: visible !important;
+			}
+		}
+	}
+}

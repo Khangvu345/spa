@@ -70,7 +70,7 @@ const KpiCards: React.FC<Props> = ({ data }) => {
 	return (
 		<Row gutter={[20, 20]} className='kpi-row'>
 			{cards.map((card) => (
-				<Col xs={24} sm={12} lg={6} key={card.key}>
+				<Col xs={12} sm={12} lg={6} key={card.key}>
 					<div className='kpi-card'>
 						<div className='kpi-top'>
 							<div className='kpi-icon' style={{ backgroundColor: card.bgColor }}>

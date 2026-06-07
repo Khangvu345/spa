@@ -1,0 +1,34 @@
+/* ============================================================
+   LỊCH HẸN (/lich-hen) — RESPONSIVE (mobile ≤ 768px)
+   Scope dưới .bookings-page để KHÔNG ảnh hưởng trang Employees
+   (vốn dùng chung class .employees-page__*). Calendar có file
+   responsive riêng ở components/calendar.less.
+   ============================================================ */
+@media (max-width: 768px) {
+	.bookings-page {
+		padding: 12px 14px !important;
+
+		.ant-tabs-nav {
+			margin-bottom: 12px;
+		}
+
+		// Thanh công cụ tab "Danh sách": xếp dọc, mọi ô full width.
+		// (Input/Select có inline width → cần !important để phủ.)
+		.employees-page__toolbar {
+			flex-direction: column;
+			align-items: stretch;
+			gap: 12px;
+			padding: 14px;
+
+			> * {
+				width: 100% !important;
+			}
+		}
+
+		// Bảng: bớt padding/bo góc; bảng tự cuộn ngang nhờ scroll={{ x: 1500 }}.
+		.employees-page__table {
+			padding: 12px;
+			border-radius: 20px;
+		}
+	}
+}

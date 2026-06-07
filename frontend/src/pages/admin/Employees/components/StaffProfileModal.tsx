@@ -106,7 +106,7 @@ export default function StaffProfileModal({ open, staff, onCancel }: Props) {
 
 					<Descriptions
 						title='Thông tin công việc'
-						column={2}
+						column={{ xs: 1, sm: 2 }}
 						size='small'
 						bordered
 						labelStyle={{ width: 160, color: '#6B7280' }}

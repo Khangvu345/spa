@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { Modal, Form, InputNumber, Radio, Input, Select, AutoComplete } from 'antd';
 import { useModel } from 'umi';
 import { COMMON_OUT_REASONS, COMMON_IN_REASON_DEFAULT } from '@/services/StockLedger/constant';
+import { fmtQty } from '@/services/Materials/constant';
 
 type Props = {
 	open: boolean;
@@ -87,7 +88,7 @@ export default function StockAdjustModal({ open, material, suppliers, onCancel, 
 		>
 			<div style={{ marginBottom: 12, fontSize: 13 }}>
 				<span style={{ color: '#6B7280' }}>Tồn kho hiện tại: </span>
-				<strong>{current}</strong> {material.unit}
+				<strong>{fmtQty(current)}</strong> {material.unit}
 			</div>
 
 			<Form form={form} layout='vertical'>
@@ -187,7 +188,7 @@ export default function StockAdjustModal({ open, material, suppliers, onCancel, 
 				>
 					<span style={{ color: '#6B7280' }}>Tồn kho sau giao dịch: </span>
 					<strong style={{ color: next < 0 ? '#DC2626' : '#059669' }}>
-						{next} {material.unit}
+						{fmtQty(next)} {material.unit}
 					</strong>
 				</div>
 			</Form>

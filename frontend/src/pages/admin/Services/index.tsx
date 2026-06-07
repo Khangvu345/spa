@@ -1,12 +1,9 @@
 // Quản lý dịch vụ — ADMIN. Khớp design Pencil.
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Table, Input, Select, Button, Tag, Dropdown, Menu, Popconfirm, Tooltip } from 'antd';
+import { Table, Input, Select, Button, Tag, Dropdown, Menu, Popconfirm, Tooltip, Image } from 'antd';
 import { useModel } from 'umi';
 import { Plus, Search, MoreHorizontal, Pencil, Power, Package, Users } from 'lucide-react';
-import {
-	SERVICE_CATEGORY_OPTIONS,
-	SERVICE_STATUS_OPTIONS,
-} from '@/services/Services/constant';
+import { SERVICE_CATEGORY_OPTIONS, SERVICE_STATUS_OPTIONS } from '@/services/Services/constant';
 import ServiceFormModal from './components/ServiceFormModal';
 import BomDrawer from './components/BomDrawer';
 import StaffAssignmentModal from './components/StaffAssignmentModal';
@@ -59,6 +56,24 @@ export default function ServicesPage() {
 				dataIndex: 'code',
 				width: 140,
 				render: (v: string) => <code style={{ fontSize: 12 }}>{v}</code>,
+			},
+			{
+				title: 'Ảnh',
+				dataIndex: 'imageUrl',
+				width: 88,
+				align: 'center' as const,
+				render: (url: string, record: SvcMgmt.IService) =>
+					url ? (
+						<Image
+							src={url}
+							alt={record.name}
+							width={52}
+							height={52}
+							style={{ objectFit: 'cover', borderRadius: 8, border: '1px solid #f0dada' }}
+						/>
+					) : (
+						<span style={{ color: '#b9a0a0' }}>--</span>
+					),
 			},
 			{
 				title: 'Tên dịch vụ',
@@ -119,18 +134,10 @@ export default function ServicesPage() {
 								>
 									Cập nhật
 								</Menu.Item>
-								<Menu.Item
-									key='bom'
-									icon={<Package size={14} />}
-									onClick={() => setBomService(r)}
-								>
+								<Menu.Item key='bom' icon={<Package size={14} />} onClick={() => setBomService(r)}>
 									Định mức nguyên liệu
 								</Menu.Item>
-								<Menu.Item
-									key='assign'
-									icon={<Users size={14} />}
-									onClick={() => setAssignService(r)}
-								>
+								<Menu.Item key='assign' icon={<Users size={14} />} onClick={() => setAssignService(r)}>
 									Phân công chuyên viên
 								</Menu.Item>
 								<Menu.Item key='toggle' icon={<Power size={14} />}>
@@ -207,7 +214,7 @@ export default function ServicesPage() {
 				loading={loading}
 				dataSource={list}
 				columns={columns as any}
-				scroll={{ x: 1100 }}
+				scroll={{ x: 1180 }}
 				pagination={{
 					current: query.page,
 					pageSize: query.limit,
@@ -218,17 +225,9 @@ export default function ServicesPage() {
 				className='employees-page__table'
 			/>
 
-			<BomDrawer
-				open={!!bomService}
-				service={bomService}
-				onClose={() => setBomService(null)}
-			/>
+			<BomDrawer open={!!bomService} service={bomService} onClose={() => setBomService(null)} />
 
-			<StaffAssignmentModal
-				open={!!assignService}
-				service={assignService}
-				onClose={() => setAssignService(null)}
-			/>
+			<StaffAssignmentModal open={!!assignService} service={assignService} onClose={() => setAssignService(null)} />
 
 			<ServiceFormModal
 				open={modalOpen}

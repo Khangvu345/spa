@@ -540,3 +540,73 @@ canvas {
 		color: var(--primary-color);
 	}
 }
+
+// Modal trên tablet/mobile (≤768px):
+// 1) Cap width vừa màn (nhiều modal đặt width cố định lớn vd 1040px → tràn ngang).
+// 2) Cap chiều cao body → cả modal gọn (≈ 60-70% màn) và CĂN GIỮA được an toàn:
+//    vì modal thấp nên khi căn giữa, header + nút X nằm ~17% từ trên xuống, vẫn dưới
+//    thanh top bar admin (56px) → luôn thấy & bấm được X. Nội dung dài cuộn trong body.
+@media (max-width: @screen-md) {
+	.ant-modal {
+		max-width: calc(100vw - 16px);
+		margin: 0 auto;
+		padding-bottom: 12px;
+	}
+
+	.ant-modal-body {
+		max-height: 58vh;
+		overflow-y: auto;
+	}
+
+	// Hàng 2 cột trong form-modal: nhiều form dùng <div style="display:flex;gap">
+	// chứa 2 Form.Item (vd Thời lượng + Buffer) → trên mobile bị bóp chồng lên nhau.
+	// Ép xếp DỌC. Các form CRUD đều layout='vertical' (Form.Item có margin-bottom lo
+	// khoảng cách) nên tắt gap để không hở gấp đôi.
+	.ant-modal-body .ant-form > div[style*='flex'] {
+		flex-direction: column;
+		gap: 0 !important;
+	}
+
+	// Drawer phải (nếu còn dùng nơi khác): trên mobile full-screen, dưới top bar admin
+	// (56px). Chỉ nhắm drawer PHẢI — KHÔNG đụng drawer sidebar (placement='left').
+	.ant-drawer-right .ant-drawer-content-wrapper {
+		width: 100% !important;
+		max-width: 100vw;
+		top: 56px;
+		height: calc(100% - 56px);
+	}
+
+	// Nút "Thu gọn" sidebar: ẩn trên mobile vì sidebar là Drawer, không cần thu gọn.
+	.auth-footer-collapse {
+		display: none !important;
+	}
+
+	// Chi tiết hoá đơn (InvoiceDetailModal): grid 2 cột → 1 cột; footer nút xếp DỌC
+	// full-width (cụm hành động lên trên, "Huỷ hoá đơn" xuống dưới). Để ở global.less
+	// cho chắc được nạp (import file .less MỚI hay bị umi bỏ qua khi HMR).
+	.invoice-detail-modal {
+		.inv-grid-2 {
+			grid-template-columns: 1fr !important;
+		}
+		.inv-footer {
+			flex-direction: column;
+			align-items: stretch;
+			gap: 8px;
+		}
+		.inv-footer > div {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+			margin: 0;
+		}
+		.inv-footer > div:first-child {
+			order: 2;
+		}
+		.inv-footer > div:last-child {
+			order: 1;
+		}
+		.inv-footer .ant-btn {
+			width: 100%;
+		}
+	}
+}

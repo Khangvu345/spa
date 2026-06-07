@@ -1,0 +1,42 @@
+/* ============================================================
+   CHI TIẾT VẬT LIỆU — Modal (popup căn giữa, KHÔNG tràn dọc).
+   Tab nav cố định; nội dung tab cuộn riêng. Desktop & mobile.
+   Modal render qua portal nên style global, khoanh .material-detail-modal.
+   ============================================================ */
+.material-detail-modal {
+	// Bỏ cap chiều cao body (rule chung mobile) để thanh tab KHÔNG bị cuộn theo;
+	// chỉ cuộn phần NỘI DUNG tab.
+	.ant-modal-body {
+		max-height: none;
+	}
+	.ant-tabs-content-holder {
+		max-height: 58vh;
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+}
+
+@media (max-width: 768px) {
+	// Mobile: rộng 92% màn (prop width=720 bị cap lại).
+	.material-detail-modal.ant-modal {
+		max-width: 92vw;
+	}
+
+	// Tab giữ kiểu PILL CAPSULE (thiết kế chung ở antd-overrides) nhưng THU NHỎ +
+	// CĂN GIỮA để 3 tab vừa trong modal hẹp — không stretch, không tràn/cắt cụt.
+	// Bớt padding Tabs, ẩn icon, tab nhỏ lại.
+	.material-detail-modal .ant-tabs {
+		padding-left: 8px !important;
+		padding-right: 8px !important;
+	}
+	.material-detail-modal .ant-tabs-nav {
+		justify-content: center !important;
+	}
+	.material-detail-modal .ant-tabs-tab {
+		padding: 6px 12px !important;
+		font-size: 12px !important;
+	}
+	.material-detail-modal .ant-tabs-tab svg {
+		display: none;
+	}
+}

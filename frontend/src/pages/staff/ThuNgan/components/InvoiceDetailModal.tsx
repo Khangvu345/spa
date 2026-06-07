@@ -5,15 +5,17 @@ import {
 	Tag,
 	Table,
 	Button,
-	InputNumber,
 	Input,
 	Form,
 	Popconfirm,
 	Divider,
+	message,
 } from 'antd';
-import { CheckCircle2, CreditCard, XCircle, Save, Package } from 'lucide-react';
-import { INVOICE_STATUS_OPTIONS } from '@/services/Invoices/constant';
+import { CheckCircle2, CreditCard, XCircle, Save, Package, Printer } from 'lucide-react';
+import { INVOICE_STATUS_OPTIONS, PAYMENT_METHOD_OPTIONS } from '@/services/Invoices/constant';
+import { fmtQty } from '@/services/Materials/constant';
 import * as ledgerApi from '@/services/StockLedger/api';
+import * as invoiceApi from '@/services/Invoices/api';
 
 type Props = {
 	open: boolean;
@@ -46,6 +48,7 @@ export default function InvoiceDetailModal({
 	const [cancelOpen, setCancelOpen] = useState(false);
 	const [stockEntries, setStockEntries] = useState<StockLedger.ILedgerEntry[]>([]);
 	const [loadingStock, setLoadingStock] = useState(false);
+	const [exportingPdf, setExportingPdf] = useState(false);
 
 	useEffect(() => {
 		if (!open || !invoice || !invoice.stockDeducted) {
@@ -62,7 +65,7 @@ export default function InvoiceDetailModal({
 
 	useEffect(() => {
 		if (open && invoice) {
-			form.setFieldsValue({ discountAmount: invoice.discountAmount, note: invoice.note });
+			form.setFieldsValue({ note: invoice.note });
 			setCancelReason('');
 			setCancelOpen(false);
 		}
@@ -73,12 +76,24 @@ export default function InvoiceDetailModal({
 	const statusOpt = INVOICE_STATUS_OPTIONS.find((s) => s.value === invoice.status);
 	const isDraft = invoice.status === 'DRAFT';
 	const isPending = invoice.status === 'PENDING_PAYMENT';
+	const isPaid = invoice.status === 'PAID';
 	const canCancel = isDraft || isPending;
+
+	// Xuất hoá đơn PDF để in bill — chỉ sau khi đã xác nhận thanh toán.
+	const handleExportPdf = async () => {
+		setExportingPdf(true);
+		try {
+			await invoiceApi.exportInvoicePdf(invoice.id, invoice.invoiceCode);
+		} catch {
+			message.error('Xuất PDF hoá đơn thất bại');
+		} finally {
+			setExportingPdf(false);
+		}
+	};
 
 	const handleSave = async () => {
 		const values = await form.validateFields();
 		const r = await onUpdate(invoice.id, {
-			discountAmount: Number(values.discountAmount ?? 0),
 			note: values.note ?? '',
 		});
 		if (r) onAfterAction();
@@ -111,9 +126,10 @@ export default function InvoiceDetailModal({
 			visible={open}
 			centered
 			width={920}
+			className='invoice-detail-modal'
 			onCancel={onCancel}
 			footer={
-				<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+				<div className='inv-footer' style={{ display: 'flex', justifyContent: 'space-between' }}>
 					<div>
 						{canCancel && (
 							<Button danger icon={<XCircle size={14} />} onClick={() => setCancelOpen(true)}>
@@ -154,11 +170,21 @@ export default function InvoiceDetailModal({
 								Ghi nhận thanh toán (tiền mặt)
 							</Button>
 						)}
+						{isPaid && (
+							<Button
+								type='primary'
+								icon={<Printer size={14} />}
+								onClick={handleExportPdf}
+								loading={exportingPdf}
+							>
+								In hoá đơn (PDF)
+							</Button>
+						)}
 					</div>
 				</div>
 			}
 		>
-			<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, fontSize: 13 }}>
+			<div className='inv-grid-2' style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, fontSize: 13 }}>
 				<div>
 					<div style={{ color: '#6B7280' }}>Khách hàng</div>
 					<div style={{ fontWeight: 500 }}>{invoice.customerSnapshot.fullName}</div>
@@ -175,7 +201,11 @@ export default function InvoiceDetailModal({
 				{invoice.paidAt && (
 					<div>
 						<div style={{ color: '#6B7280' }}>Thanh toán</div>
-						<div>{invoice.paidByName} — {invoice.paymentMethod}</div>
+						<div>
+							{invoice.paidByName} —{' '}
+							{PAYMENT_METHOD_OPTIONS.find((m) => m.value === invoice.paymentMethod)?.label ??
+								invoice.paymentMethod}
+						</div>
 						<div style={{ color: '#6B7280', fontSize: 12 }}>{fmtTime(invoice.paidAt)}</div>
 					</div>
 				)}
@@ -195,8 +225,9 @@ export default function InvoiceDetailModal({
 				size='small'
 				dataSource={invoice.items}
 				pagination={false}
+				scroll={{ x: 720 }}
 				columns={[
-					{ title: 'Dịch vụ', dataIndex: 'serviceName', ellipsis: true },
+					{ title: 'Dịch vụ', dataIndex: 'serviceName', width: 180, ellipsis: true },
 					{ title: 'NV', dataIndex: 'staffName', width: 130, ellipsis: true },
 					{ title: 'SL', dataIndex: 'quantity', width: 60, align: 'center' as const },
 					{
@@ -225,17 +256,8 @@ export default function InvoiceDetailModal({
 
 			<Divider style={{ margin: '14px 0' }} />
 
-			<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+			<div className='inv-grid-2' style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
 				<Form form={form} layout='vertical' disabled={!isDraft}>
-					<Form.Item name='discountAmount' label='Giảm giá (VND)'>
-						<InputNumber
-							style={{ width: '100%' }}
-							min={0}
-							step={1000}
-							formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-							parser={((v: string) => v.replace(/[^\d]/g, '')) as any}
-						/>
-					</Form.Item>
 					<Form.Item name='note' label='Ghi chú'>
 						<Input.TextArea rows={3} maxLength={500} />
 					</Form.Item>
@@ -251,7 +273,9 @@ export default function InvoiceDetailModal({
 				>
 					<Row label='Tạm tính dịch vụ' value={fmtVnd(invoice.itemsSubtotal)} />
 					<Row label='Phụ thu' value={fmtVnd(invoice.extraCharge)} />
-					<Row label='Giảm giá' value={`- ${fmtVnd(invoice.discountAmount)}`} negative />
+					{invoice.discountAmount > 0 && (
+						<Row label='Giảm giá' value={`- ${fmtVnd(invoice.discountAmount)}`} negative />
+					)}
 					<Divider style={{ margin: '8px 0' }} />
 					<Row
 						label={<strong>Tổng thanh toán</strong>}
@@ -294,8 +318,9 @@ export default function InvoiceDetailModal({
 						loading={loadingStock}
 						dataSource={stockEntries}
 						pagination={false}
+						scroll={{ x: 440 }}
 						columns={[
-							{ title: 'Vật liệu', dataIndex: 'materialName', ellipsis: true },
+							{ title: 'Vật liệu', dataIndex: 'materialName', width: 160, ellipsis: true },
 							{
 								title: 'Mã',
 								dataIndex: 'materialCode',
@@ -309,7 +334,7 @@ export default function InvoiceDetailModal({
 								align: 'center' as const,
 								render: (v: number, r: StockLedger.ILedgerEntry) => (
 									<span style={{ color: '#DC2626', fontWeight: 600 }}>
-										{v} {r.materialUnit}
+										{fmtQty(v)} {r.materialUnit}
 									</span>
 								),
 							},
@@ -318,6 +343,7 @@ export default function InvoiceDetailModal({
 								dataIndex: 'stockAfter',
 								width: 80,
 								align: 'center' as const,
+								render: fmtQty,
 							},
 						]}
 					/>

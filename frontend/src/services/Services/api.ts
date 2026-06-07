@@ -80,3 +80,9 @@ export function createService(payload: SvcMgmt.ICreatePayload) {
 export function updateService(id: string, payload: SvcMgmt.IUpdatePayload) {
 	return unwrap<SvcMgmt.IService>(axios.patch(`${BASE}/${id}`, payload));
 }
+
+export function uploadServiceImage(file: File | Blob) {
+	const form = new FormData();
+	form.append('file', file);
+	return unwrap<SvcMgmt.IUploadImageResponse>(axios.post(`${authBaseUrl}/upload/service-image`, form));
+}

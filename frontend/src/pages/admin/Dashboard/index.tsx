@@ -7,6 +7,7 @@ import RevenueChart from './components/RevenueChart';
 import AppointmentStatusChart from './components/AppointmentStatusChart';
 import RecentAppointments from './components/RecentAppointments';
 import PopularServices from './components/PopularServices';
+import ReportsPanel from './components/ReportsPanel';
 import './style.less';
 
 const Dashboard: React.FC = () => {
@@ -42,6 +43,8 @@ const Dashboard: React.FC = () => {
 							<PopularServices data={data?.popularServices} />
 						</Col>
 					</Row>
+
+					<ReportsPanel />
 				</div>
 			</Spin>
 		</div>
