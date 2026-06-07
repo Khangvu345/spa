@@ -7,6 +7,7 @@ import type {
   TDocumentDefinitions,
 } from 'pdfmake/interfaces';
 import { ERROR_CODES } from '../../shared/constants/error-codes';
+import type { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
 import { InvoiceResponseDto } from '../invoice/dto/invoice-response.dto';
 import { PayrollResponseDto } from '../payroll/dto/payroll-response.dto';
 import { RevenueReportDto } from '../reports/dto/report-response.dto';
@@ -40,6 +41,15 @@ const STAFF_ROLE_LABELS: Record<string, string> = {
   STAFF: 'Chuyên viên',
 };
 
+interface PdfBuildOptions {
+  exportedBy?: AuthenticatedUser | null;
+}
+
+interface PdfSignatureOptions {
+  preparedByName?: string | null;
+  approvedByName?: string | null;
+}
+
 @Injectable()
 export class PdfService {
   private static fontsConfigured = false;
@@ -48,7 +58,11 @@ export class PdfService {
     this.configureFonts();
   }
 
-  async buildRevenuePdf(report: RevenueReportDto): Promise<Buffer> {
+  async buildRevenuePdf(
+    report: RevenueReportDto,
+    options?: PdfBuildOptions,
+  ): Promise<Buffer> {
+    const exportedByName = this.resolveUserDisplayName(options?.exportedBy);
     const body = [
       this.tableHeader(['STT', 'Dịch vụ', 'Số lượt', 'Doanh thu']),
       ...report.breakdown.map((row, index) => [
@@ -64,23 +78,37 @@ export class PdfService {
     }
 
     return this.renderPdf(
-      this.baseDocument('Báo cáo doanh thu', [
-        { text: 'BÁO CÁO DOANH THU', style: 'title' },
-        this.keyValueTable([
-          ['Từ ngày', this.formatDateOnly(report.period.fromDate)],
-          ['Đến ngày', this.formatDateOnly(report.period.toDate)],
-          ['Dịch vụ lọc', report.serviceId ?? 'Tất cả'],
-          ['Số hóa đơn đã thanh toán', this.formatNumber(report.invoiceCount)],
-          ['Tổng doanh thu', this.formatMoney(report.totalRevenue)],
-        ]),
-        { text: 'Chi tiết theo dịch vụ', style: 'sectionTitle' },
-        this.dataTable(['auto', '*', 'auto', 'auto'], body),
-        { text: report.note, style: 'note' },
-      ]),
+      this.baseDocument(
+        'Báo cáo doanh thu',
+        [
+          { text: 'BÁO CÁO DOANH THU', style: 'title' },
+          this.keyValueTable([
+            ['Từ ngày', this.formatDateOnly(report.period.fromDate)],
+            ['Đến ngày', this.formatDateOnly(report.period.toDate)],
+            ['Dịch vụ lọc', report.serviceId ?? 'Tất cả'],
+            ['Số hóa đơn đã thanh toán', this.formatNumber(report.invoiceCount)],
+            ['Tổng doanh thu', this.formatMoney(report.totalRevenue)],
+          ]),
+          { text: 'Chi tiết theo dịch vụ', style: 'sectionTitle' },
+          this.dataTable(['auto', '*', 'auto', 'auto'], body),
+          {
+            text: this.getRevenuePdfNote(report),
+            style: 'note',
+          },
+        ],
+        {
+          preparedByName: exportedByName,
+          approvedByName: exportedByName,
+        },
+      ),
     );
   }
 
-  async buildInvoicePdf(invoice: InvoiceResponseDto): Promise<Buffer> {
+  async buildInvoicePdf(
+    invoice: InvoiceResponseDto,
+    options?: PdfBuildOptions,
+  ): Promise<Buffer> {
+    const exportedByName = this.resolveUserDisplayName(options?.exportedBy);
     const body = [
       this.tableHeader([
         'STT',
@@ -92,7 +120,7 @@ export class PdfService {
       ]),
       ...invoice.items.map((item, index) => [
         String(index + 1),
-        `${item.serviceName}\n${item.serviceCode}`,
+        item.serviceName,
         item.staffName,
         this.formatNumber(item.quantity),
         this.formatMoney(item.unitPrice),
@@ -105,37 +133,48 @@ export class PdfService {
     }
 
     return this.renderPdf(
-      this.baseDocument(`Hóa đơn ${invoice.invoiceCode}`, [
-        { text: 'HÓA ĐƠN DỊCH VỤ', style: 'title' },
-        this.keyValueTable([
-          ['Mã hóa đơn', invoice.invoiceCode],
-          ['Trạng thái', this.translateInvoiceStatus(invoice.status)],
-          ['Khách hàng', invoice.customerSnapshot.fullName],
-          ['Số điện thoại', invoice.customerSnapshot.phone],
-          ['Email', invoice.customerSnapshot.email || '-'],
-          ['Ngày tạo', this.formatDateTime(invoice.createdAt)],
-          ['Ngày thanh toán', this.formatDateTime(invoice.paidAt)],
-          [
-            'Phương thức thanh toán',
-            this.translatePaymentMethod(invoice.paymentMethod),
-          ],
-          ['Người tạo', invoice.createdByName],
-          ['Người thu tiền', invoice.paidByName ?? '-'],
-        ]),
-        { text: 'Chi tiết dịch vụ', style: 'sectionTitle' },
-        this.dataTable(['auto', '*', '*', 'auto', 'auto', 'auto'], body),
-        this.summaryTable([
-          ['Tạm tính', this.formatMoney(invoice.itemsSubtotal)],
-          ['Phụ thu', this.formatMoney(invoice.extraCharge)],
-          ['Giảm giá', this.formatMoney(invoice.discountAmount)],
-          ['Tổng thanh toán', this.formatMoney(invoice.totalAmount)],
-        ]),
-        { text: `Ghi chú: ${invoice.note || '-'}`, style: 'note' },
-      ]),
+      this.baseDocument(
+        `Hóa đơn ${invoice.invoiceCode}`,
+        [
+          { text: 'HÓA ĐƠN DỊCH VỤ', style: 'title' },
+          this.keyValueTable([
+            ['Mã hóa đơn', invoice.invoiceCode],
+            ['Trạng thái', this.translateInvoiceStatus(invoice.status)],
+            ['Khách hàng', invoice.customerSnapshot.fullName],
+            ['Số điện thoại', invoice.customerSnapshot.phone],
+            ['Email', invoice.customerSnapshot.email || '-'],
+            ['Ngày tạo', this.formatDateTime(invoice.createdAt)],
+            ['Ngày thanh toán', this.formatDateTime(invoice.paidAt)],
+            [
+              'Phương thức thanh toán',
+              this.translatePaymentMethod(invoice.paymentMethod),
+            ],
+            ['Người tạo', invoice.createdByName],
+            ['Người thu tiền', invoice.paidByName ?? '-'],
+          ]),
+          { text: 'Chi tiết dịch vụ', style: 'sectionTitle' },
+          this.dataTable(['auto', '*', '*', 'auto', 'auto', 'auto'], body),
+          this.summaryTable([
+            ['Tạm tính', this.formatMoney(invoice.itemsSubtotal)],
+            ['Phụ thu', this.formatMoney(invoice.extraCharge)],
+            ['Giảm giá', this.formatMoney(invoice.discountAmount)],
+            ['Tổng thanh toán', this.formatMoney(invoice.totalAmount)],
+          ]),
+          ...this.optionalNote(invoice.note),
+        ],
+        {
+          preparedByName: invoice.createdByName || exportedByName,
+          approvedByName: invoice.paidByName,
+        },
+      ),
     );
   }
 
-  async buildPayrollPdf(payroll: PayrollResponseDto): Promise<Buffer> {
+  async buildPayrollPdf(
+    payroll: PayrollResponseDto,
+    options?: PdfBuildOptions,
+  ): Promise<Buffer> {
+    const exportedByName = this.resolveUserDisplayName(options?.exportedBy);
     const body = [
       this.tableHeader(['STT', 'Dịch vụ', 'Số lượt', 'Hoa hồng']),
       ...payroll.commissionBreakdown.map((row, index) => [
@@ -151,29 +190,36 @@ export class PdfService {
     }
 
     return this.renderPdf(
-      this.baseDocument(`Phiếu lương ${payroll.payrollCode}`, [
-        { text: 'PHIẾU LƯƠNG NHÂN VIÊN', style: 'title' },
-        this.keyValueTable([
-          ['Mã phiếu', payroll.payrollCode],
-          ['Kỳ lương', `${payroll.periodMonth}/${payroll.periodYear}`],
-          ['Nhân viên', payroll.staffSnapshot.fullName],
-          ['Vai trò', this.translateStaffRole(payroll.staffSnapshot.role)],
-          ['Trạng thái', this.translatePayrollStatus(payroll.status)],
-          ['Số hóa đơn nguồn', this.formatNumber(payroll.invoiceCount)],
-          ['Ngày chốt', this.formatDateTime(payroll.finalizedAt)],
-          ['Ngày chi trả', this.formatDateTime(payroll.paidAt)],
-          ['Người chốt', payroll.finalizedByName],
-        ]),
-        { text: 'Chi tiết hoa hồng theo dịch vụ', style: 'sectionTitle' },
-        this.dataTable(['auto', '*', 'auto', 'auto'], body),
-        this.summaryTable([
-          ['Lương cơ bản', this.formatMoney(payroll.baseSalary)],
-          ['Tổng hoa hồng', this.formatMoney(payroll.totalCommission)],
-          ['Điều chỉnh', this.formatMoney(payroll.adjustment)],
-          ['Tổng thu nhập', this.formatMoney(payroll.totalIncome)],
-        ]),
-        { text: `Ghi chú: ${payroll.note || '-'}`, style: 'note' },
-      ]),
+      this.baseDocument(
+        `Phiếu lương ${payroll.payrollCode}`,
+        [
+          { text: 'PHIẾU LƯƠNG NHÂN VIÊN', style: 'title' },
+          this.keyValueTable([
+            ['Mã phiếu', payroll.payrollCode],
+            ['Kỳ lương', `${payroll.periodMonth}/${payroll.periodYear}`],
+            ['Nhân viên', payroll.staffSnapshot.fullName],
+            ['Vai trò', this.translateStaffRole(payroll.staffSnapshot.role)],
+            ['Trạng thái', this.translatePayrollStatus(payroll.status)],
+            ['Số hóa đơn nguồn', this.formatNumber(payroll.invoiceCount)],
+            ['Ngày chốt', this.formatDateTime(payroll.finalizedAt)],
+            ['Ngày chi trả', this.formatDateTime(payroll.paidAt)],
+            ['Người chốt', payroll.finalizedByName],
+          ]),
+          { text: 'Chi tiết hoa hồng theo dịch vụ', style: 'sectionTitle' },
+          this.dataTable(['auto', '*', 'auto', 'auto'], body),
+          this.summaryTable([
+            ['Lương cơ bản', this.formatMoney(payroll.baseSalary)],
+            ['Tổng hoa hồng', this.formatMoney(payroll.totalCommission)],
+            ['Điều chỉnh', this.formatMoney(payroll.adjustment)],
+            ['Tổng thu nhập', this.formatMoney(payroll.totalIncome)],
+          ]),
+          ...this.optionalNote(payroll.note),
+        ],
+        {
+          preparedByName: payroll.finalizedByName || exportedByName,
+          approvedByName: payroll.finalizedByName,
+        },
+      ),
     );
   }
 
@@ -223,6 +269,7 @@ export class PdfService {
   private baseDocument(
     title: string,
     content: Content[],
+    signature?: PdfSignatureOptions,
   ): TDocumentDefinitions {
     const exportedAt = new Date().toISOString();
 
@@ -291,12 +338,30 @@ export class PdfService {
       content: [
         { text: 'LUNAR SPA', style: 'brand' },
         ...content,
+        this.signatureBlock(signature),
+      ],
+    };
+  }
+
+  private signatureBlock(signature?: PdfSignatureOptions): Content {
+    return {
+      columns: [
+        this.signatureColumn('Người lập phiếu', signature?.preparedByName),
+        this.signatureColumn('Người duyệt', signature?.approvedByName),
+      ],
+      margin: [0, 30, 0, 0],
+    };
+  }
+
+  private signatureColumn(label: string, name?: string | null): Content {
+    return {
+      stack: [
+        { text: label, alignment: 'center' },
         {
-          columns: [
-            { text: 'Người lập phiếu', alignment: 'center' },
-            { text: 'Người duyệt', alignment: 'center' },
-          ],
-          margin: [0, 30, 0, 0],
+          text: this.formatOptionalText(name),
+          alignment: 'center',
+          bold: Boolean(name?.trim()),
+          margin: [0, 32, 0, 0],
         },
       ],
     };
@@ -346,6 +411,33 @@ export class PdfService {
       layout: 'lightHorizontalLines',
       margin: [0, 12, 0, 0],
     };
+  }
+
+  private optionalNote(note?: string | null): Content[] {
+    const cleanedNote = note?.trim();
+    if (!cleanedNote) {
+      return [];
+    }
+
+    return [{ text: `Ghi chú: ${cleanedNote}`, style: 'note' }];
+  }
+
+  private getRevenuePdfNote(report: RevenueReportDto): string {
+    if (!report.note?.trim()) {
+      return '';
+    }
+
+    return 'Lưu ý: Doanh thu từng dịch vụ chưa phân bổ giảm giá toàn hóa đơn, nên tổng chi tiết có thể khác tổng doanh thu đã thanh toán.';
+  }
+
+  private resolveUserDisplayName(
+    user?: Pick<AuthenticatedUser, 'email' | 'fullName'> | null,
+  ): string | null {
+    return user?.fullName?.trim() || user?.email?.trim() || null;
+  }
+
+  private formatOptionalText(value?: string | null): string {
+    return value?.trim() || '-';
   }
 
   private tableHeader(headers: string[]): TableCell[] {
