@@ -110,7 +110,9 @@ export class PayrollController {
     @Res() res: Response,
   ): Promise<void> {
     const payroll = await this.payrollService.findOne(id, user);
-    const buffer = await this.pdfService.buildPayrollPdf(payroll);
+    const buffer = await this.pdfService.buildPayrollPdf(payroll, {
+      exportedBy: user,
+    });
     const filename = `payroll-${payroll.payrollCode}.pdf`;
 
     res.setHeader('Content-Type', 'application/pdf');

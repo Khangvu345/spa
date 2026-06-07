@@ -7,7 +7,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import type { Response } from 'express';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
+import type { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
 import { StaffRole } from '../employee/employee/staff.schema';
 import { PdfService } from '../pdf/pdf.service';
 import {
@@ -119,10 +121,13 @@ export class ReportsController {
   })
   async exportRevenuePdf(
     @Query() query: RevenueReportQueryDto,
+    @CurrentUser() user: AuthenticatedUser,
     @Res() res: Response,
   ): Promise<void> {
     const report = await this.reportsService.getRevenueReport(query);
-    const buffer = await this.pdfService.buildRevenuePdf(report);
+    const buffer = await this.pdfService.buildRevenuePdf(report, {
+      exportedBy: user,
+    });
     const filename = `bao-cao-doanh-thu-${query.fromDate}-${query.toDate}.pdf`;
 
     res.setHeader('Content-Type', 'application/pdf');

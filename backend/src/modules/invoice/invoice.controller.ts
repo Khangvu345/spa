@@ -68,10 +68,13 @@ export class InvoiceController {
   })
   async exportPdf(
     @Param('id', ParseObjectIdPipe) id: string,
+    @CurrentUser() user: AuthenticatedUser,
     @Res() res: Response,
   ): Promise<void> {
     const invoice = await this.invoiceService.findOne(id);
-    const buffer = await this.pdfService.buildInvoicePdf(invoice);
+    const buffer = await this.pdfService.buildInvoicePdf(invoice, {
+      exportedBy: user,
+    });
     const filename = `invoice-${invoice.invoiceCode}.pdf`;
 
     res.setHeader('Content-Type', 'application/pdf');
