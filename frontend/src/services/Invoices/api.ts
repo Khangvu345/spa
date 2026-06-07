@@ -45,3 +45,22 @@ export function markPaidInvoice(id: string, payload: InvoiceMgmt.IMarkPaidPayloa
 export function cancelInvoice(id: string, reason: string) {
 	return unwrap<InvoiceMgmt.IInvoice>(axios.post(`${BASE}/${id}/cancel`, { reason }));
 }
+
+// Xuất hoá đơn PDF để in bill — BE trả binary (KHÔNG envelope) → blob, mở tab mới.
+export async function exportInvoicePdf(id: string, invoiceCode?: string): Promise<void> {
+	const res = await axios.get(`${BASE}/${id}/export-pdf`, { responseType: 'blob' });
+	const blob = new Blob([res.data as any], { type: 'application/pdf' });
+	const url = window.URL.createObjectURL(blob);
+	const win = window.open(url, '_blank');
+	// Trình duyệt chặn popup → fallback tải file.
+	if (!win) {
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `hoa-don-${invoiceCode ?? id}.pdf`;
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+	}
+	// Giải phóng URL sau khi tab đã load.
+	setTimeout(() => window.URL.revokeObjectURL(url), 60_000);
+}

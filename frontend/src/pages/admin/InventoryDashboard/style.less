@@ -290,3 +290,77 @@
 			inset -1px -1px 2px rgba(0, 0, 0, 0.08);
 	}
 }
+
+/* ============================================================
+   RESPONSIVE — MOBILE (≤ 768px)
+   KPI & card đã dùng Row/Col antd (xs=24 → 1 cột). Chỉ giảm
+   padding/font, và cho bảng custom (.inv-table cột width cố định)
+   cuộn ngang vì không co được trong màn nhỏ.
+   ============================================================ */
+@media (max-width: 768px) {
+	.inventory-dash {
+		padding: 14px;
+
+		// 2 thẻ/hàng (xs=12) — khớp main Dashboard: thu padding + value 20px.
+		.inv-kpi {
+			padding: 16px;
+			border-radius: 20px;
+
+			&__value {
+				font-size: 20px;
+			}
+		}
+
+		.inv-card {
+			padding: 16px;
+			border-radius: 20px;
+		}
+
+		// Bảng custom (cột px cố định ~450px + cột Tên flex:1) → cuộn ngang trên mobile.
+		// min-width đủ lớn để cột Tên có ~210px, tên dài không wrap đè cột bên cạnh.
+		.inv-table {
+			overflow-x: auto;
+
+			&__head,
+			&__row {
+				min-width: 660px;
+			}
+
+			.col-name {
+				min-width: 180px;
+			}
+		}
+	}
+}
+
+// ---- Điện thoại (<576px): KPI 2 thẻ/hàng thu gọn — KHỚP main Dashboard
+// (icon + badge xếp DỌC cho vừa thẻ hẹp, icon/value/label nhỏ lại). ----
+@media (max-width: 575px) {
+	.inventory-dash .inv-kpi {
+		padding: 14px;
+		gap: 6px;
+		border-radius: 18px;
+
+		&__top {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 8px;
+		}
+		&__icon {
+			width: 36px;
+			height: 36px;
+			border-radius: 12px;
+		}
+		&__badge {
+			font-size: 10px;
+			padding: 3px 8px;
+		}
+		&__value {
+			font-size: 20px;
+		}
+		&__label {
+			font-size: 11.5px;
+			line-height: 1.3;
+		}
+	}
+}

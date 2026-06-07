@@ -25,6 +25,7 @@ import {
 	SERVICE_ORDER_STATUS_OPTIONS,
 	SERVICE_ORDER_EDITABLE_STATUSES,
 } from '@/services/ServiceOrders/constant';
+import './OrderDetailDrawer.less';
 
 type Props = {
 	order: SvcOrderMgmt.IServiceOrder | null;
@@ -299,6 +300,7 @@ export default function OrderDetailDrawer({
 			width={1040}
 			centered
 			destroyOnClose
+			className='so-detail-modal'
 			title={
 				order ? (
 					<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: 32, gap: 16, flexWrap: 'wrap' }}>
@@ -350,7 +352,7 @@ export default function OrderDetailDrawer({
 				</div>
 			) : (
 				<>
-					<Descriptions size='small' column={2} bordered>
+					<Descriptions size='small' column={{ xs: 1, sm: 2 }} bordered>
 						<Descriptions.Item label='Trạng thái'>
 							<Tag color={statusOpt?.color}>{statusOpt?.label}</Tag>
 						</Descriptions.Item>
@@ -387,6 +389,7 @@ export default function OrderDetailDrawer({
 						<Form
 							form={form}
 							layout='inline'
+							className='so-add-form'
 							style={{
 								marginBottom: 16,
 								padding: 12,
@@ -440,7 +443,7 @@ export default function OrderDetailDrawer({
 
 					<Divider style={{ margin: '16px 0 12px' }}>Tổng kết & ghi chú</Divider>
 
-					<div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+					<div className='so-summary' style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
 						<div style={{ flex: 1, minWidth: 320 }}>
 							<Form layout='vertical' size='small'>
 								<Form.Item label='Phụ thu (VND)'>

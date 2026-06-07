@@ -12,8 +12,8 @@ export const perks = [
 export default () => {
 	const [loading, setLoading] = useState(false);
 	const [services, setServices] = useState<{ id: string; name: string }[]>([]);
-	// Grid toàn bộ khung giờ FREE/BUSY trong ngày (giống modal tạo lịch hẹn của operator).
-	const [grid, setGrid] = useState<BookingMgmt.IAvailabilityGrid | null>(null);
+	// Các khung giờ TRỐNG gợi ý cho khách — endpoint public /availability (tối đa 8 slot).
+	const [slots, setSlots] = useState<string[]>([]);
 	const [loadingSlots, setLoadingSlots] = useState(false);
 	// Booking PENDING_OTP đang chờ nhập mã (null = modal OTP đóng).
 	const [otpBooking, setOtpBooking] = useState<BookingMgmt.IBooking | null>(null);
@@ -29,17 +29,17 @@ export default () => {
 		}
 	}, []);
 
-	const loadGrid = useCallback(async (serviceId: string, date: string) => {
+	const loadSlots = useCallback(async (serviceId: string, date: string) => {
 		if (!serviceId || !date) {
-			setGrid(null);
+			setSlots([]);
 			return;
 		}
 		setLoadingSlots(true);
 		try {
-			const res = await bookingsApi.getAvailabilityGrid(serviceId, date);
-			setGrid(res.data);
+			const res = await bookingsApi.getAvailability(serviceId, date);
+			setSlots(res.data.suggestedSlots ?? []);
 		} catch (e: any) {
-			setGrid(null);
+			setSlots([]);
 			const msg = e?.response?.data?.message;
 			if (msg) message.warning(Array.isArray(msg) ? msg.join(', ') : msg);
 		} finally {
@@ -54,21 +54,28 @@ export default () => {
 	};
 
 	// Submit form → tạo booking PENDING_OTP + gửi mã OTP qua email, mở modal nhập mã.
-	// Trả { ok, conflict }: conflict = true khi slot vừa bị đặt (409) để FE tải lại grid.
+	// Trả { ok, conflict }: conflict = true khi slot vừa bị đặt (409) để FE tải lại khung giờ.
 	const requestOtp = useCallback(async (payload: BookingMgmt.IRequestOtpPayload) => {
 		setLoading(true);
 		try {
 			const res = await bookingsApi.requestBookingOtp(payload);
 			setOtpBooking(res.data);
-			return { ok: true, conflict: false };
+			return { ok: true, conflict: false, errorMsg: '' };
 		} catch (e: any) {
-			const conflict = errorCode(e) === 'BOOKING_SLOT_UNAVAILABLE';
-			if (!conflict) {
-				// 409 đã có notification toàn cục với message từ BE; lỗi khác mới cần báo thêm.
-				const msg = e?.response?.data?.message;
-				message.error(Array.isArray(msg) ? msg.join(', ') : msg || 'Không gửi được mã OTP, vui lòng thử lại');
+			const code = errorCode(e);
+			const conflict = code === 'BOOKING_SLOT_UNAVAILABLE';
+			// Map mã lỗi BE → thông báo thân thiện (tiếng Việt có dấu) cho khách.
+			let friendly: string;
+			if (conflict) {
+				friendly = 'Khung giờ vừa chọn đã có người đặt. Vui lòng chọn khung giờ khác.';
+			} else if (code === 'BOOKING_OUTSIDE_OPEN_HOURS') {
+				friendly = 'Khung giờ nằm ngoài giờ mở cửa (08:00–22:00) hoặc không đủ thời gian cho dịch vụ. Vui lòng chọn lại.';
+			} else {
+				const raw = e?.response?.data?.message;
+				friendly = (Array.isArray(raw) ? raw.join(', ') : raw) || 'Không gửi được mã OTP, vui lòng thử lại.';
 			}
-			return { ok: false, conflict };
+			message.error(friendly);
+			return { ok: false, conflict, errorMsg: friendly };
 		} finally {
 			setLoading(false);
 		}
@@ -76,24 +83,34 @@ export default () => {
 
 	const verifyOtp = useCallback(
 		async (code: string) => {
-			if (!otpBooking) return false;
+			if (!otpBooking) return { ok: false, error: '', closed: true };
 			setVerifying(true);
 			try {
 				const res = await bookingsApi.verifyBookingOtp(otpBooking.id, code);
 				if (res.data?.confirmed) {
 					message.success('Xác thực thành công! Lịch hẹn của bạn đã được xác nhận.');
 					setOtpBooking(null);
-					setGrid(null);
-					return true;
+					setSlots([]);
+					return { ok: true, error: '', closed: false };
 				}
-				return false;
+				return { ok: false, error: 'Mã OTP không đúng. Vui lòng kiểm tra và nhập lại.', closed: false };
 			} catch (e: any) {
-				// BE đã huỷ booking khi quá số lần / sai trạng thái → đóng modal, yêu cầu đặt lại.
 				const code2 = errorCode(e);
+				// BE đã huỷ booking khi quá số lần / sai trạng thái → đóng modal, yêu cầu đặt lại.
 				if (code2 === 'OTP_MAX_ATTEMPTS_EXCEEDED' || code2 === 'BOOKING_INVALID_STATUS') {
 					setOtpBooking(null);
+					const error =
+						code2 === 'OTP_MAX_ATTEMPTS_EXCEEDED'
+							? 'Bạn đã nhập sai mã quá số lần cho phép. Lịch đặt đã bị huỷ, vui lòng đặt lại.'
+							: 'Phiên đặt lịch đã kết thúc. Vui lòng đặt lại.';
+					message.error(error);
+					return { ok: false, error, closed: true };
 				}
-				return false;
+				const raw = e?.response?.data?.message;
+				const error =
+					(Array.isArray(raw) ? raw.join(', ') : raw) || 'Mã OTP không đúng hoặc đã hết hạn. Vui lòng thử lại.';
+				message.error(error);
+				return { ok: false, error, closed: false };
 			} finally {
 				setVerifying(false);
 			}
@@ -102,14 +119,17 @@ export default () => {
 	);
 
 	const resendOtp = useCallback(async () => {
-		if (!otpBooking) return false;
+		if (!otpBooking) return { ok: false, error: '' };
 		setResending(true);
 		try {
 			await bookingsApi.resendBookingOtp(otpBooking.id);
 			message.success('Đã gửi lại mã OTP, vui lòng kiểm tra email.');
-			return true;
-		} catch {
-			return false;
+			return { ok: true, error: '' };
+		} catch (e: any) {
+			const raw = e?.response?.data?.message;
+			const error = (Array.isArray(raw) ? raw.join(', ') : raw) || 'Không gửi lại được mã, vui lòng thử lại sau.';
+			message.error(error);
+			return { ok: false, error };
 		} finally {
 			setResending(false);
 		}
@@ -121,10 +141,10 @@ export default () => {
 		loading,
 		perks,
 		services,
-		grid,
+		slots,
 		loadingSlots,
 		loadServices,
-		loadGrid,
+		loadSlots,
 		requestOtp,
 		verifyOtp,
 		resendOtp,

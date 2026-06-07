@@ -1,6 +1,14 @@
 import { MapPin, Phone, Mail, Clock3 } from "lucide-react";
+import { useModel } from "umi";
 
 export function Footer() {
+  const { list } = useModel("landingServices") as { list: DichVu.IRecord[] };
+  // Lấy tối đa 5 dịch vụ thật từ backend; fallback khi chưa tải xong.
+  const footerServices =
+    list && list.length > 0
+      ? list.slice(0, 5).map((s) => s.name)
+      : ["Massage Trị Liệu", "Chăm Sóc Da Mặt", "Tẩy Tế Bào Chết", "Liệu Pháp Tinh Dầu", "Đá Nóng Trị Liệu"];
+
   return (
     <footer
       id="contact"
@@ -63,10 +71,10 @@ export function Footer() {
           <h4 className="text-base font-extrabold" style={{ fontFamily: "Nunito, sans-serif", color: "#FFFFFF" }}>
             Dịch vụ
           </h4>
-          {["Massage Trị Liệu", "Chăm Sóc Da Mặt", "Tẩy Tế Bào Chết", "Liệu Pháp Tinh Dầu", "Đá Nóng Trị Liệu"].map((svc) => (
+          {footerServices.map((svc) => (
             <a
               key={svc}
-              href="#"
+              href="#services"
               className="text-sm transition-colors"
               style={{
                 fontFamily: "DM Sans, sans-serif",

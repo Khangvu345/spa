@@ -62,6 +62,7 @@ const RecentAppointments: React.FC<Props> = ({ data }) => {
 				pagination={false}
 				size='middle'
 				className='appointments-table'
+				scroll={{ x: 560 }}
 				locale={{ emptyText: 'Chưa có phiếu nào' }}
 			/>
 		</div>

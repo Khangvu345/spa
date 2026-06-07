@@ -61,9 +61,8 @@ export default function BookingDetailModal({ open, booking, onCancel }: Props) {
 				</div>
 				<div>
 					<div style={{ color: '#6B7280' }}>Khung giờ</div>
-					<div>{fmtTime(booking.scheduledStart)}</div>
-					<div style={{ color: '#6B7280', fontSize: 12 }}>
-						đến {moment(booking.scheduledEnd).format('HH:mm')}
+					<div>
+						{fmtTime(booking.scheduledStart)} – {moment(booking.scheduledEnd).format('HH:mm')}
 					</div>
 				</div>
 				{booking.serviceOrderId && (

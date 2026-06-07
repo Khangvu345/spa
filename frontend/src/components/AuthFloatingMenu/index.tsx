@@ -54,11 +54,13 @@ export default function AuthFloatingMenu({ collapsed = false }: { collapsed?: bo
 				collapsed={collapsed}
 				onClick={() => history.push('/ho-so-cua-toi')}
 			/>
+			{/* Thu gọn/Mở rộng — ẩn trên mobile (sidebar là Drawer, không cần thu gọn) */}
 			<FooterItem
 				icon={collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
 				label={collapsed ? 'Mở rộng' : 'Thu gọn'}
 				collapsed={collapsed}
 				muted
+				className='auth-footer-collapse'
 				onClick={toggleCollapse}
 			/>
 			<FooterItem
@@ -78,6 +80,7 @@ function FooterItem({
 	collapsed,
 	danger,
 	muted,
+	className,
 	onClick,
 }: {
 	icon: React.ReactNode;
@@ -85,6 +88,7 @@ function FooterItem({
 	collapsed: boolean;
 	danger?: boolean;
 	muted?: boolean;
+	className?: string;
 	onClick: () => void;
 }) {
 	const color = danger ? '#c44545' : muted ? 'var(--clay-muted)' : 'var(--clay-foreground)';
@@ -95,6 +99,7 @@ function FooterItem({
 		<button
 			onClick={onClick}
 			title={label}
+			className={className}
 			style={{
 				display: 'flex',
 				alignItems: 'center',

@@ -27,7 +27,6 @@ export default function LoginForm() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [showPassword, setShowPassword] = useState(false);
-	const [remember, setRemember] = useState(false);
 	const [alert, setAlert] = useState<TAlert>(null);
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -174,33 +173,6 @@ export default function LoginForm() {
 						</div>
 					</div>
 
-					<div className='flex flex-wrap items-center justify-between gap-2'>
-						<label className='flex items-center gap-2 cursor-pointer'>
-							<input
-								type='checkbox'
-								checked={remember}
-								onChange={(e) => setRemember(e.target.checked)}
-								className='w-[18px] h-[18px] rounded accent-[var(--accent-deep)]'
-							/>
-							<span
-								className='text-[13px]'
-								style={{
-									fontFamily: 'DM Sans, sans-serif',
-									color: 'var(--clay-muted)',
-									fontWeight: 500,
-								}}
-							>
-								Ghi nhớ đăng nhập
-							</span>
-						</label>
-						<a
-							href='#'
-							className='text-[13px] font-bold hover:opacity-80 transition-opacity'
-							style={{ fontFamily: 'Nunito, sans-serif', color: 'var(--clay-accent)' }}
-						>
-							Quên mật khẩu?
-						</a>
-					</div>
 				</div>
 
 				{alert?.tone === 'error' && (

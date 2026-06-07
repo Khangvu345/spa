@@ -1,0 +1,56 @@
+/* ============================================================
+   CHI TIẾT PHIẾU DỊCH VỤ (OrderDetailDrawer) — RESPONSIVE
+   Width modal đã được cap chung ở global.less (≤768px). File này
+   chỉ tinh chỉnh NỘI DUNG bên trong cho vừa màn nhỏ.
+   Modal render qua portal ở document.body nên style để global,
+   khoanh vùng dưới .so-detail-modal.
+   ============================================================ */
+@media (max-width: 768px) {
+	.so-detail-modal {
+		.ant-modal-body {
+			padding: 16px;
+		}
+
+		// Khối Tổng kết & ghi chú: 2 cột → xếp dọc full width (bỏ minWidth inline).
+		.so-summary > div {
+			flex: 1 1 100% !important;
+			min-width: 0 !important;
+		}
+
+		// Form "Thêm dịch vụ": layout='inline' bị lỗi trên màn nhỏ (label nằm cạnh
+		// control, control 100% đè lên label). Ép về dạng DỌC: mỗi field 1 dòng,
+		// label nằm trên, control full-width; nút Thêm full-width cho dễ bấm.
+		.so-add-form {
+			display: block;
+
+			.ant-form-item {
+				display: block;
+				width: 100%;
+				margin: 0 0 10px;
+			}
+			.ant-form-item:last-child {
+				margin-bottom: 0;
+			}
+			.ant-form-item-label {
+				text-align: left;
+				padding: 0 0 4px;
+
+				label {
+					height: auto;
+				}
+			}
+			.ant-form-item-control,
+			.ant-form-item-control-input,
+			.ant-select,
+			.ant-input-number,
+			.ant-input {
+				width: 100% !important;
+			}
+			.ant-btn {
+				width: 100%;
+			}
+		}
+
+		// Bảng dịch vụ trong phiếu đã có scroll={{ x: 1000 }} → tự cuộn ngang.
+	}
+}
