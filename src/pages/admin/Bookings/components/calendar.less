@@ -96,6 +96,27 @@
 		border-left: 1px solid rgba(196, 112, 112, 0.1);
 	}
 
+	// FIX lệch cột (deterministic): RBC bù lề header bằng `scrollbarSize() - 1`, hay
+	// lệch vài px so với scrollbar thật → cột lệch dần sang phải. Thay vì đoán số px,
+	// cho HEADER tự chừa đúng MỘT scrollbar gutter y như body bằng overflow-y: scroll.
+	// 2 bên dùng chung style ::-webkit-scrollbar (track trong suốt) nên chừa chỗ khớp
+	// tuyệt đối, không phụ thuộc scrollbar rộng bao nhiêu. Bỏ luôn margin sai của RBC.
+	.rbc-time-header.rbc-overflowing {
+		margin-right: 0 !important;
+		// RBC còn cộng border-right 1px (CSS gốc dòng 630) vào phần chừa của header
+		// → header dư 1px so với body, lệch dồn ra cột phải (T6/T7). Bỏ luôn.
+		border-right: 0 !important;
+		overflow-y: scroll;
+	}
+
+	// FIX chính: ẩn hàng "all-day". Spa đặt lịch luôn có giờ cụ thể, không bao giờ
+	// có sự kiện all-day. Hàng này (rbc-allday-cell > rbc-row-bg > rbc-day-bg) tính
+	// width cột theo cơ chế riêng, lệch so với nhãn thứ/ngày & lưới giờ → đây chính
+	// là "chỗ lệch chỗ không" nhìn thấy. Bỏ hẳn cho gọn và hết lệch.
+	.rbc-allday-cell {
+		display: none !important;
+	}
+
 	.rbc-timeslot-group {
 		border-bottom: 1px solid rgba(196, 112, 112, 0.06);
 		min-height: 88px;
@@ -109,11 +130,17 @@
 		min-height: 44px;
 	}
 
-	// Thu nhỏ cột giờ trái để mở rộng vùng day cho event hiện đủ content
+	// Thu nhỏ cột giờ trái để mở rộng vùng day cho event hiện đủ content.
+	// QUAN TRỌNG: ép CẢ ô gutter trên header (.rbc-time-header-gutter) bằng đúng
+	// 64px như gutter body — nếu không, RBC tự đo width header-gutter ra số khác
+	// → toàn bộ cột ngày ở header lệch so với lưới body ("lệch 1 ít").
 	.rbc-time-gutter,
-	.rbc-time-gutter .rbc-time-column {
+	.rbc-time-gutter .rbc-time-column,
+	.rbc-time-header-gutter {
+		box-sizing: border-box;
 		width: 64px !important;
 		min-width: 64px !important;
+		max-width: 64px !important;
 		flex: 0 0 64px !important;
 	}
 
@@ -177,6 +204,27 @@
 		box-shadow: 0 0 0 2px rgba(196, 112, 112, 0.5);
 	}
 
+	// Nội dung thẻ gom (nhiều lịch cùng giờ): badge số lượng + nhãn.
+	.rbc-group-event {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-family: 'Nunito', sans-serif;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.rbc-group-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 3px;
+		flex-shrink: 0;
+		background: rgba(255, 255, 255, 0.28);
+		border-radius: 999px;
+		padding: 1px 8px;
+		font-weight: 800;
+	}
+
 	.rbc-show-more {
 		color: var(--clay-accent);
 		font-family: 'Nunito', sans-serif;
@@ -185,5 +233,182 @@
 
 	.rbc-off-range-bg {
 		background: rgba(245, 233, 233, 0.25);
+	}
+}
+
+/* ============================================================
+   RESPONSIVE — MOBILE (≤ 768px)
+   Lịch view-only: thu gọn gutter/slot/font cho vừa màn nhỏ, xếp
+   toolbar dọc. 7 cột tuần co lại nhưng vẫn liếc nhanh được; muốn
+   xem kỹ thì bấm nút "Ngày". KHÔNG đổi cấu trúc component.
+   ============================================================ */
+@media (max-width: 768px) {
+	.bookings-calendar {
+		padding: 12px;
+		border-radius: 18px;
+
+		// Toolbar xếp dọc: nhãn (kỳ) lên trên, 2 nhóm nút ở dưới căn giữa.
+		.rbc-toolbar {
+			flex-direction: column;
+			align-items: stretch;
+			gap: 10px;
+			margin-bottom: 12px;
+
+			.rbc-toolbar-label {
+				order: -1;
+				font-size: 16px;
+			}
+			.rbc-btn-group {
+				display: flex;
+				justify-content: center;
+			}
+			button {
+				font-size: 12px;
+				padding: 6px 12px;
+			}
+		}
+
+		// Thu cột giờ trái (gutter) 64 → 44, ép cả ô gutter header cho khớp.
+		.rbc-time-gutter,
+		.rbc-time-gutter .rbc-time-column,
+		.rbc-time-header-gutter {
+			width: 44px !important;
+			min-width: 44px !important;
+			max-width: 44px !important;
+			flex: 0 0 44px !important;
+		}
+		.rbc-time-gutter .rbc-time-slot {
+			padding: 0 4px;
+			font-size: 10px;
+		}
+
+		.rbc-header {
+			padding: 8px 2px;
+			font-size: 11px;
+		}
+
+		// Hàng giờ thấp lại để bớt phải cuộn dọc.
+		.rbc-timeslot-group {
+			min-height: 64px;
+		}
+		.rbc-time-slot {
+			min-height: 32px;
+		}
+
+		// Event card gọn lại.
+		.rbc-event {
+			padding: 4px 6px !important;
+			min-height: 30px;
+			border-radius: 8px !important;
+		}
+		.rbc-event-label {
+			font-size: 10px;
+			margin-bottom: 4px;
+		}
+		.rbc-event-content {
+			font-size: 11px;
+			line-height: 1.25;
+		}
+	}
+
+	// View NGÀY trên mobile: chỉ 1 cột full màn hình → cho event TO & dễ đọc hơn,
+	// cột giờ thoáng hơn (ghi đè lại bản gọn của view Tuần ở trên).
+	.bookings-calendar.is-day {
+		.rbc-time-gutter,
+		.rbc-time-gutter .rbc-time-column,
+		.rbc-time-header-gutter {
+			width: 56px !important;
+			min-width: 56px !important;
+			max-width: 56px !important;
+			flex: 0 0 56px !important;
+		}
+		.rbc-time-gutter .rbc-time-slot {
+			font-size: 11px;
+		}
+
+		.rbc-timeslot-group {
+			min-height: 80px;
+		}
+		.rbc-time-slot {
+			min-height: 40px;
+		}
+
+		.rbc-event {
+			padding: 8px 12px !important;
+			min-height: 44px;
+			border-radius: 12px !important;
+		}
+		.rbc-event-label {
+			font-size: 12px;
+			margin-bottom: 6px;
+		}
+		.rbc-event-content {
+			font-size: 13px;
+			line-height: 1.35;
+		}
+	}
+}
+
+/* ============================================================
+   POPUP DANH SÁCH LỊCH CÙNG GIỜ (bấm vào thẻ gom)
+   Modal antd render qua portal ở document.body → KHÔNG nằm trong
+   .bookings-calendar, nên style để ở phạm vi global.
+   ============================================================ */
+.bookings-group-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+.bookings-group-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+	text-align: left;
+	padding: 12px 14px;
+	border: none;
+	border-radius: 14px;
+	background: #fff5f5;
+	cursor: pointer;
+	box-shadow: 0 2px 6px rgba(180, 130, 130, 0.12);
+	transition: transform 0.18s ease, box-shadow 0.18s ease;
+
+	&:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 6px 14px rgba(196, 112, 112, 0.2);
+	}
+
+	&__main {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		min-width: 0;
+	}
+	&__name {
+		font-family: 'Nunito', sans-serif;
+		font-weight: 700;
+		font-size: 14px;
+		color: var(--clay-foreground);
+	}
+	&__service {
+		font-size: 12px;
+		color: var(--clay-muted);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	&__meta {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 4px;
+		flex-shrink: 0;
+	}
+	&__time {
+		font-family: 'DM Sans', sans-serif;
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--clay-foreground);
 	}
 }

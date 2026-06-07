@@ -1,4 +1,5 @@
 import React from "react";
+import heroBackground from "@/assets/landingPage-img/hero-background.png";
 
 export const HeroSection: React.FC = () => {
   const scrollToId = (id: string) => {
@@ -11,7 +12,7 @@ export const HeroSection: React.FC = () => {
       style={{ fontFamily: "DM Sans, sans-serif" }}
     >
       <img
-        src={require("@/assets/landingPage-img/hero-background.png")}
+        src={heroBackground}
         alt="Ảnh nền"
         className="absolute inset-0 w-full h-full object-cover"
       />

@@ -1,5 +1,5 @@
 // State + logic cho Hoá đơn.
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { message } from 'antd';
 import * as api from '@/services/Invoices/api';
 import { DEFAULT_PAGE_SIZE } from '@/services/Invoices/constant';
@@ -17,10 +17,15 @@ export default () => {
 		sortOrder: 'desc',
 	});
 
+	// Giữ query MỚI NHẤT qua ref — tránh stale closure trong fetch() (deps rỗng):
+	// gọi fetch() không tham số sau thao tác sẽ giữ nguyên bộ lọc đang áp dụng.
+	const queryRef = useRef(query);
+
 	const fetch = useCallback(async (override?: Partial<InvoiceMgmt.IQuery>) => {
 		setLoading(true);
 		try {
-			const next = { ...query, ...(override ?? {}) };
+			const next = { ...queryRef.current, ...(override ?? {}) };
+			queryRef.current = next;
 			setQuery(next);
 			const res = await api.getInvoices(next);
 			setList(res.items);

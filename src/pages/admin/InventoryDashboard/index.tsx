@@ -5,11 +5,13 @@ import { ArrowRight, AlertTriangle, ArrowUp, Package, TrendingUp, Wallet } from 
 import { history } from 'umi';
 import PageHeader from '@/components/PageHeader';
 import * as materialsApi from '@/services/Materials/api';
+import { fmtQty } from '@/services/Materials/constant';
 import * as ordersApi from '@/services/ServiceOrders/api';
 import * as stockApi from '@/services/StockLedger/api';
 import './style.less';
 
-const fmtMoney = (v: number) => v?.toLocaleString('vi-VN') ?? 0;
+// Math.round chống sai số float (tồn kho lẻ × đơn giá có thể ra 2969999.9999…).
+const fmtMoney = (v: number) => (v != null ? Math.round(v).toLocaleString('vi-VN') : 0);
 
 export default function InventoryDashboardPage() {
 	const [materials, setMaterials] = useState<MaterialMgmt.IMaterial[]>([]);
@@ -148,7 +150,7 @@ export default function InventoryDashboardPage() {
 				<div className='inventory-dash__body'>
 					<Row gutter={[24, 24]}>
 						{kpis.map((k) => (
-							<Col xs={24} sm={12} lg={6} key={k.key}>
+							<Col xs={12} sm={12} lg={6} key={k.key}>
 								<div className='inv-kpi'>
 									<div className='inv-kpi__top'>
 										<div className='inv-kpi__icon' style={{ background: k.iconBg }}>
@@ -205,9 +207,9 @@ export default function InventoryDashboardPage() {
 														fontWeight: low ? 600 : 500,
 													}}
 												>
-													{m.stockQuantity}
+													{fmtQty(m.stockQuantity)}
 												</div>
-												<div className='col col-min'>{m.reorderLevel}</div>
+												<div className='col col-min'>{fmtQty(m.reorderLevel)}</div>
 												<div className='col col-status'>
 													<span
 														className='status-pill'
@@ -255,7 +257,7 @@ export default function InventoryDashboardPage() {
 															{m.materialName}
 														</div>
 														<div className='inv-alert__sub' style={{ color: p.text }}>
-															Còn {m.stockQuantity}/{m.reorderLevel} {m.unit}
+															Còn {fmtQty(m.stockQuantity)}/{fmtQty(m.reorderLevel)} {m.unit}
 														</div>
 													</div>
 													<button

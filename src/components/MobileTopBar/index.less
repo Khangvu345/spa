@@ -1,0 +1,108 @@
+// Top bar + hamburger admin cho mobile. MỌI thứ ẩn ở desktop (>768px).
+// Lưu ý: ProLayout đã tự render sidebar thành <Drawer class="ant-pro-drawer-sider">
+// (tự trượt ra/vào, có mask, bấm ngoài tự đóng). Ở đây KHÔNG tự đặt position cho
+// sider nữa — chỉ thêm top bar để mở drawer + tinh chỉnh cho khớp top bar.
+
+.admin-mobile-topbar {
+	display: none;
+}
+// Spacer đẩy nội dung xuống dưới top bar fixed (chỉ cao ở mobile).
+.admin-mobile-topbar-spacer {
+	height: 0;
+}
+
+@media (max-width: 768px) {
+	.admin-mobile-topbar {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 56px;
+		padding: 0 14px;
+		background: rgba(255, 255, 255, 0.96);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+		box-shadow: 0 2px 12px rgba(180, 150, 150, 0.18);
+		// Trên content & trên Drawer mask (mặc định ~1000) để luôn bấm được nút X.
+		z-index: 1100;
+	}
+
+	.admin-mobile-topbar-spacer {
+		height: 56px;
+	}
+
+	.admin-mobile-burger {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 5px;
+		width: 42px;
+		height: 42px;
+		padding: 0;
+		border: none;
+		border-radius: 12px;
+		background: rgba(196, 112, 112, 0.08);
+		cursor: pointer;
+		flex-shrink: 0;
+
+		span {
+			display: block;
+			width: 20px;
+			height: 2px;
+			border-radius: 2px;
+			background: #4a3f3f;
+			transition: transform 0.25s ease, opacity 0.25s ease;
+		}
+
+		&.is-open span:nth-child(1) {
+			transform: translateY(7px) rotate(45deg);
+		}
+		&.is-open span:nth-child(2) {
+			opacity: 0;
+		}
+		&.is-open span:nth-child(3) {
+			transform: translateY(-7px) rotate(-45deg);
+		}
+	}
+
+	.admin-mobile-brand {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+
+		img {
+			width: 34px;
+			height: 34px;
+			border-radius: 50%;
+			object-fit: cover;
+		}
+		span {
+			font-family: 'Nunito', sans-serif;
+			font-weight: 800;
+			font-size: 17px;
+			color: #4a3f3f;
+		}
+	}
+
+	// Drawer sidebar gốc của ProLayout — chỉ tinh chỉnh cho khớp top bar:
+	.ant-pro-drawer-sider {
+		// menu bắt đầu dưới top bar (cao 56px)
+		.ant-pro-sider {
+			padding-top: 56px !important;
+		}
+		// ẩn logo trùng vì top bar đã hiển thị thương hiệu
+		.ant-pro-sider-logo {
+			display: none !important;
+		}
+	}
+
+	// Khi drawer ĐÓNG: aside là position:fixed nên không bị translateX(-100%)
+	// của wrapper kéo ra hết → còn dải đè mép trái. Ẩn hẳn aside lúc đóng.
+	.ant-pro-drawer-sider:not(.ant-drawer-open) .ant-pro-sider {
+		display: none !important;
+	}
+}

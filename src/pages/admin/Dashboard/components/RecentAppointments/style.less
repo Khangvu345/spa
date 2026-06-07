@@ -97,6 +97,14 @@
 		height: auto;
 	}
 
+	// Hàng đo cột antd sinh ra khi có scroll-x (ant-table-measure-row) vốn rỗng;
+	// padding !important ở trên làm nó phình thành 1 hàng trống — ép về 0.
+	.ant-table-tbody > tr.ant-table-measure-row > td {
+		padding: 0 !important;
+		border-bottom: none !important;
+		height: 0;
+	}
+
 	.ant-table-tbody > tr:last-child > td {
 		border-bottom: none;
 	}

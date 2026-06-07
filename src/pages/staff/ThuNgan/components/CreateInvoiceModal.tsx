@@ -1,6 +1,6 @@
 // Modal tạo hoá đơn từ Service Order đã COMPLETED.
 import { useEffect, useState } from 'react';
-import { Modal, Select, InputNumber, Input, Form, Spin, Tag, Empty } from 'antd';
+import { Modal, Select, Input, Form, Spin, Tag, Empty } from 'antd';
 import * as ordersApi from '@/services/ServiceOrders/api';
 
 type Props = {
@@ -44,7 +44,6 @@ export default function CreateInvoiceModal({ open, loading, onCancel, onSubmit }
 		const values = await form.validateFields();
 		const r = await onSubmit({
 			serviceOrderId: values.serviceOrderId,
-			discountAmount: Number(values.discountAmount ?? 0),
 			note: values.note ?? '',
 		});
 		if (r) form.resetFields();
@@ -67,7 +66,7 @@ export default function CreateInvoiceModal({ open, loading, onCancel, onSubmit }
 				<Form form={form} layout='vertical'>
 					<Form.Item
 						name='serviceOrderId'
-						label='Phiếu dịch vụ (COMPLETED)'
+						label='Phiếu dịch vụ đã hoàn thành'
 						rules={[{ required: true, message: 'Chọn phiếu DV' }]}
 					>
 						<Select
@@ -77,7 +76,7 @@ export default function CreateInvoiceModal({ open, loading, onCancel, onSubmit }
 							notFoundContent={
 								orders.length === 0 ? (
 									<Empty
-										description='Không có phiếu nào COMPLETED chưa xuất HĐ'
+										description='Không có phiếu hoàn thành nào chưa xuất hoá đơn'
 										image={Empty.PRESENTED_IMAGE_SIMPLE}
 									/>
 								) : null
@@ -101,7 +100,7 @@ export default function CreateInvoiceModal({ open, loading, onCancel, onSubmit }
 						>
 							<div>
 								<strong>{selected.orderCode}</strong>{' '}
-								<Tag color='#059669'>COMPLETED</Tag>
+								<Tag color='#059669'>Hoàn thành</Tag>
 							</div>
 							<div style={{ color: '#6B7280', marginTop: 4 }}>
 								Khách: {selected.customer?.fullName} · {selected.customer?.phone}
@@ -115,16 +114,6 @@ export default function CreateInvoiceModal({ open, loading, onCancel, onSubmit }
 							</div>
 						</div>
 					)}
-
-					<Form.Item name='discountAmount' label='Giảm giá (VND)' initialValue={0}>
-						<InputNumber
-							style={{ width: '100%' }}
-							min={0}
-							step={1000}
-							formatter={(v) => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-							parser={((v: string) => v.replace(/[^\d]/g, '')) as any}
-						/>
-					</Form.Item>
 
 					<Form.Item name='note' label='Ghi chú'>
 						<Input.TextArea rows={2} maxLength={500} placeholder='VD: Khách thanh toán cuối ngày' />

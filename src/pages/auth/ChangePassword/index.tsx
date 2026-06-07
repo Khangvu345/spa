@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import '@/pages/loginPage/components/styles.less';
 import { history, useModel } from 'umi';
 import { changePassword } from '@/services/Auth/api';
@@ -83,17 +84,28 @@ export default function ChangePasswordPage() {
 }
 
 function Field({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+	const [show, setShow] = useState(false);
 	return (
 		<div className='flex flex-col gap-1.5'>
 			<label className='text-[13px] font-medium' style={{ color: 'var(--text-primary)' }}>
 				{label}
 			</label>
-			<input
-				type='password'
-				value={value}
-				onChange={(e) => onChange(e.target.value)}
-				className='login-form__input w-full text-sm outline-none'
-			/>
+			<div className='relative'>
+				<input
+					type={show ? 'text' : 'password'}
+					value={value}
+					onChange={(e) => onChange(e.target.value)}
+					className='login-form__input login-form__input--with-icon w-full text-sm outline-none'
+				/>
+				<button
+					type='button'
+					onClick={() => setShow(!show)}
+					aria-label={show ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+					className='login-form__eye'
+				>
+					{show ? <EyeOff size={18} /> : <Eye size={18} />}
+				</button>
+			</div>
 		</div>
 	);
 }

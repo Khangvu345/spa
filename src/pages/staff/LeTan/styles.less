@@ -5,3 +5,35 @@
 	padding: 24px 32px;
 	margin: 0;
 }
+
+// Cụm status + nút thao tác (gom chung). Desktop: nằm bên phải dòng.
+.le-tan-row__meta {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-shrink: 0;
+}
+
+/* ============================================================
+   RESPONSIVE — MOBILE (≤ 768px)
+   KPI dùng Col xs=12 (2 cột) đã ổn. Dòng lịch hẹn là flex inline
+   không xuống dòng → cho wrap để status + nút thao tác rớt xuống
+   dòng dưới thay vì tràn/bóp méo trên màn nhỏ.
+   ============================================================ */
+@media (max-width: 768px) {
+	.le-tan-dashboard {
+		padding: 14px;
+
+		.le-tan-row {
+			flex-wrap: wrap;
+			gap: 8px 12px !important;
+			padding: 12px 14px !important;
+		}
+
+		// Cụm status + nút → chiếm trọn DÒNG 2, status trái, nút phải. Gọn gàng.
+		.le-tan-row__meta {
+			flex-basis: 100%;
+			justify-content: space-between;
+		}
+	}
+}

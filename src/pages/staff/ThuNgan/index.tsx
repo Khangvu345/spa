@@ -1,11 +1,12 @@
 // Thu ngân — OPERATOR. Quản lý hoá đơn từ Service Order.
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Table, Tag, Input, Select, DatePicker, Button, Dropdown, Menu, Tooltip } from 'antd';
+import { Table, Tag, Input, Select, DatePicker, Button, Dropdown, Menu, Tooltip, message } from 'antd';
 import { useModel } from 'umi';
-import { Plus, Search, MoreHorizontal, Eye, CreditCard, XCircle, CheckCircle2 } from 'lucide-react';
+import { Plus, Search, MoreHorizontal, Eye, CreditCard, XCircle, CheckCircle2, Printer } from 'lucide-react';
 import moment from 'moment';
 import PageHeader from '@/components/PageHeader';
 import { INVOICE_STATUS_OPTIONS } from '@/services/Invoices/constant';
+import * as invoiceApi from '@/services/Invoices/api';
 import CreateInvoiceModal from './components/CreateInvoiceModal';
 import InvoiceDetailModal from './components/InvoiceDetailModal';
 import '@/pages/admin/Employees/styles.less';
@@ -99,13 +100,6 @@ export default function ThuNganPage() {
 				render: (v: number) => fmtVnd(v),
 			},
 			{
-				title: 'Giảm giá',
-				dataIndex: 'discountAmount',
-				width: 100,
-				align: 'center' as const,
-				render: (v: number) => (v > 0 ? <span style={{ color: '#DC2626' }}>-{fmtVnd(v)}</span> : '—'),
-			},
-			{
 				title: 'Tổng',
 				dataIndex: 'totalAmount',
 				width: 120,
@@ -136,6 +130,7 @@ export default function ThuNganPage() {
 				render: (_: any, r: InvoiceMgmt.IInvoice) => {
 					const isDraft = r.status === 'DRAFT';
 					const isPending = r.status === 'PENDING_PAYMENT';
+					const isPaid = r.status === 'PAID';
 					return (
 						<Dropdown
 							overlay={
@@ -165,6 +160,19 @@ export default function ThuNganPage() {
 											}}
 										>
 											Ghi nhận thanh toán
+										</Menu.Item>
+									)}
+									{isPaid && (
+										<Menu.Item
+											key='print'
+											icon={<Printer size={14} />}
+											onClick={() =>
+												invoiceApi
+													.exportInvoicePdf(r.id, r.invoiceCode)
+													.catch(() => message.error('Xuất PDF hoá đơn thất bại'))
+											}
+										>
+											In hoá đơn (PDF)
 										</Menu.Item>
 									)}
 									{(isDraft || isPending) && (

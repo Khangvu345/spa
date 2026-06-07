@@ -1,6 +1,9 @@
 // Landing page overrides — đã chuyển sang clay aesthetic.
 // Token nguồn ở src/styles/tailwind.css và antd-overrides.less.
 
+// Responsive mobile/tablet — toàn bộ rule bọc trong @media, desktop không đổi.
+@import './responsive.less';
+
 html {
   scroll-behavior: smooth;
 }
@@ -87,6 +90,7 @@ textarea.landing-input.ant-input:focus,
     background: linear-gradient(135deg, #e09a9a 0%, #b85f5f 100%) !important;
     transform: translateY(-3px);
   }
+
   &:active {
     transform: scale(0.95);
   }

@@ -4,16 +4,39 @@
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <% var __target = context.config.define.APP_CONFIG_TARGET; %>
+  <% var __isAdmin = __target === 'admin'; %>
+  <% var __title = __isAdmin ? 'Luna Spa — Hệ thống quản lý' : 'Luna Spa — Thư giãn & Chăm sóc sức khỏe'; %>
+  <% var __desc = 'Luna Spa — Nơi bình yên và sắc đẹp của bạn. Liệu trình cá nhân hóa giúp tái tạo cơ thể, thư giãn tâm trí và phục hồi tinh thần, kết hợp phương pháp chữa lành truyền thống với kỹ thuật chăm sóc sức khỏe hiện đại.'; %>
+  <% var __image = context.config.publicPath + 'og-image.png'; %>
   <meta name="keywords"
-    content="<%= context.config.define.APP_CONFIG_TIEN_TO_TRUONG %>, <%= context.config.define.APP_CONFIG_TEN_TRUONG_VIET_TAT_TIENG_ANH %>, Trực tuyến, HỆ THỐNG CHUYỂN ĐỔI SỐ - <%= context.config.define.APP_CONFIG_TEN_TRUONG.toUpperCase() %>, đào tạo" />
-  <meta property="og:image" content="/metadata.png" />
-  <meta name="description"
-    content="HỆ THỐNG CHUYỂN ĐỔI SỐ - <%= context.config.define.APP_CONFIG_TEN_TRUONG.toUpperCase() %>" />
+    content="Luna Spa, spa, massage trị liệu, chăm sóc da mặt, liệu pháp tinh dầu, thư giãn, làm đẹp, đặt lịch spa" />
+  <meta name="description" content="<%= __desc %>" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+  <!-- Site quản lý là cổng nội bộ: chặn Google index. Landing thì cho index. -->
+  <meta name="robots" content="<%= __isAdmin ? 'noindex, nofollow' : 'index, follow' %>" />
+
+  <!-- Open Graph (Facebook, Zalo, ...) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Luna Spa" />
+  <meta property="og:title" content="<%= __title %>" />
+  <meta property="og:description" content="<%= __desc %>" />
+  <meta property="og:image" content="<%= __image %>" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="<%= __title %>" />
+  <meta name="twitter:description" content="<%= __desc %>" />
+  <meta name="twitter:image" content="<%= __image %>" />
+
   <title>
-    HỆ THỐNG CHUYỂN ĐỔI SỐ - <%= context.config.define.APP_CONFIG_TEN_TRUONG.toUpperCase() %>
+    <%= __title %>
   </title>
   <link rel="icon" href="<%= context.config.publicPath +'favicon.ico'%>" type="image/x-icon" />
+  <link rel="icon" type="image/png" sizes="32x32" href="<%= context.config.publicPath +'favicon-32.png'%>" />
+  <link rel="apple-touch-icon" sizes="180x180" href="<%= context.config.publicPath +'apple-touch-icon.png'%>" />
   <style>
     :root {
       /* Hỗ trợ đổi màu realtime */

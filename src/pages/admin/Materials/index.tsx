@@ -6,6 +6,7 @@ import { Plus, Search, MoreHorizontal, Pencil, Power, PackagePlus, Eye } from 'l
 import {
 	MATERIAL_TYPE_OPTIONS,
 	MATERIAL_STATUS_OPTIONS,
+	fmtQty,
 } from '@/services/Materials/constant';
 import MaterialFormModal from './components/MaterialFormModal';
 import StockAdjustModal from './components/StockAdjustModal';
@@ -94,7 +95,7 @@ export default function MaterialsPage() {
 					const low = v <= r.reorderLevel;
 					return (
 						<span style={{ color: low ? '#DC2626' : '#1F2937', fontWeight: low ? 600 : 400 }}>
-							{v}
+							{fmtQty(v)}
 						</span>
 					);
 				},
